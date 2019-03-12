@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1007982082587",
+    "firebase_url": "https://garbage-collector-react.firebaseio.com",
+    "project_id": "garbage-collector-react",
+    "storage_bucket": "garbage-collector-react.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007982082587:android:bbca466580e154a5",
+        "android_client_info": {
+          "package_name": "com.gc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007982082587-0beugqh6nd66renca9756qf8c2091u6m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gc",
+            "certificate_hash": "20f0e676776401f49c945404bdc17f6bd919aba3"
+          }
+        },
+        {
+          "client_id": "1007982082587-3pgt9r8kkq2lh7r6mohbuc026mhodmi7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlk16SB7Lq9pat1Gnt5yyBRpWkLGMYAgg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007982082587-3pgt9r8kkq2lh7r6mohbuc026mhodmi7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
