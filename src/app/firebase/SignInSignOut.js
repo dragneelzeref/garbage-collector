@@ -161,3 +161,29 @@ export const signOut = props => {
     });
   }
 };
+
+export const updateData = (props, data) => {
+  firebase
+    .firestore()
+    .collection("users")
+    .doc(props.user.uid)
+    .update({ ...data })
+    .then(() => {
+      props.dispatch(getLoggedInUserInfo(data));
+      AsyncStorage.mergeItem("user", JSON.stringify(data));
+      Snackbar.show({
+        title: "Updated successfully",
+        duration: Snackbar.LENGTH_LONG,
+        backgroundColor: "green",
+        color: "white"
+      });
+    })
+    .catch(() => {
+      Snackbar.show({
+        title: "Error while updating",
+        duration: Snackbar.LENGTH_LONG,
+        backgroundColor: "red",
+        color: "white"
+      });
+    });
+};

@@ -69,7 +69,7 @@ export default class App extends Component<Props> {
 
 const handleNetworkConnection = isConnected => {
   if (!isConnected) {
-    Snackbar.show({ title: "No Connection", duration: Snackbar.LENGTH_LONG });
+    // Snackbar.show({ title: "No Connection", duration: Snackbar.LENGTH_LONG });
 
     ToastAndroid.show("No Connection", ToastAndroid.LONG);
     // this.props.dispatch(toggleNetworkOverlay());
@@ -78,7 +78,7 @@ const handleNetworkConnection = isConnected => {
     ToastAndroid.show("Connected", ToastAndroid.LONG);
     // this.props.dispatch(toggleNetworkOverlay());
     // StatusBar.setBackgroundColor("rgba(255,255,255,1)");
-    Snackbar.show({ title: "Connected", duration: Snackbar.LENGTH_LONG });
+    // Snackbar.show({ title: "Connected", duration: Snackbar.LENGTH_LONG });
 
     AsyncStorage.getItem("user").then(result => {
       const temp = JSON.parse(result);
