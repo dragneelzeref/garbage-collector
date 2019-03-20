@@ -13,6 +13,11 @@ import {
   User
 } from "../../navigation/UserConstants/UserConstant";
 
+import {
+  getLocationUpdates,
+  removeLocationUpdates
+} from "../../components/Location/Listener";
+
 class Home extends Component {
   state = {
     Drawer: DrawerUser
@@ -20,12 +25,16 @@ class Home extends Component {
 
   componentDidMount() {
     this.mapUserWithComponet();
+    getLocationUpdates(this.props);
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.user != prevProps.user) {
       this.mapUserWithComponet();
     }
+  }
+  componentWillUnmount() {
+    removeLocationUpdates();
   }
   render() {
     return <this.state.Drawer />;

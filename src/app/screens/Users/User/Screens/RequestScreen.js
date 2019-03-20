@@ -93,16 +93,7 @@ class RequestScreen extends Component {
             }
             onPress={() => {
               getCurrentLocation(this.props);
-              if (this.props.localLocation.coords != null) {
-                this.map.animateToRegion(
-                  {
-                    ...this.state.region,
-                    latitude: this.props.localLocation.coords.latitude,
-                    longitude: this.props.localLocation.coords.longitude
-                  },
-                  1000
-                );
-              }
+              this.moveRegion(this.props.localLocation.coords);
             }}
           />
         </View>
@@ -112,6 +103,18 @@ class RequestScreen extends Component {
   onRegionChange = region => {
     this.setState({ region });
     console.log(region);
+  };
+  moveRegion = location => {
+    if (location != null) {
+      this.map.animateToRegion(
+        {
+          ...this.state.region,
+          latitude: location.latitude,
+          longitude: location.longitude
+        },
+        1000
+      );
+    }
   };
 }
 

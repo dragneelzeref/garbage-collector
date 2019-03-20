@@ -17,7 +17,7 @@ import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import NetworkOverlay from "../../NetworkOverlay";
 import FloatingHeaderBar from "../../../../components/FloatingHeaderBar";
 
-import { getCurrentLocation } from "../../../../components/Location/getCurrentLocation";
+import { getLocation } from "../../../../components/Location/Listener";
 
 import {
   latitudeDelta,
@@ -83,7 +83,7 @@ class HomeScreen extends Component {
               />
             }
             onPress={() => {
-              getCurrentLocation(this.props);
+              getLocation(this.props);
               if (this.props.localLocation.coords != null) {
                 this.map.animateToRegion(
                   {
