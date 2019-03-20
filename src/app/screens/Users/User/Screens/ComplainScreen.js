@@ -76,6 +76,7 @@ class ComplainScreen extends Component {
               }
               inputContainerStyle={styles.emailInputContainer}
               returnKeyType="next"
+              value={this.props.user.gmail}
             />
           </View>
           <View style={styles.cardContainer}>
@@ -135,7 +136,11 @@ class ComplainScreen extends Component {
     this.validateComplain();
     this.validateEmail();
     if (this.state.complainError === null && this.state.emailError === null) {
-      sendComplain(this.state.email, this.state.complain);
+      sendComplain({
+        email: this.state.email,
+        complain: this.state.complain,
+        ...this.props.user
+      });
     }
   }
 }
