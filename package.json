@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "firebase": "^5.8.2",
+    "randomcolor": "^0.5.4",
     "react": "16.6.3",
     "react-native": "^0.58.4",
     "react-native-android-location-enabler": "^1.0.8",
@@ -19,13 +20,16 @@
     "react-native-gesture-handler": "^1.0.15",
     "react-native-google-signin": "^1.1.0",
     "react-native-ignore-warnings": "^0.1.1",
+    "react-native-linear-gradient": "^2.5.4",
     "react-native-maps": "^0.23.0",
     "react-native-sensitive-info": "^5.2.7",
     "react-native-snackbar": "^0.5.5",
+    "react-native-touchable-scale": "^2.0.0",
     "react-native-vector-icons": "^6.2.0",
     "react-navigation": "^3.1.5",
     "react-redux": "^6.0.0",
-    "redux": "^4.0.1"
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "babel-core": "^7.0.0-bridge.0",

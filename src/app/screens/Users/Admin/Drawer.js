@@ -2,6 +2,7 @@ import { createAppContainer, createDrawerNavigator } from "react-navigation";
 import HomeScreen from "./Screens/HomeScreen";
 import ProfileScreen from "../ProfileScreen";
 import CustomeDrawerCompoent from "../CustomeDrawerCompoent";
+import ComplainScreen from "./Screens/ComplainScreen";
 
 const Drawer = createDrawerNavigator(
   {
@@ -10,6 +11,9 @@ const Drawer = createDrawerNavigator(
     },
     Profile: {
       screen: ProfileScreen
+    },
+    Complains: {
+      screen: ComplainScreen
     }
   },
   {
