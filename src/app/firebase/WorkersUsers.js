@@ -8,6 +8,8 @@ import RandomColor from "randomcolor";
 
 import Snackbar from "react-native-snackbar";
 
+import axios from "axios";
+
 import {
   storeWorker,
   deleteWorker,
@@ -69,20 +71,30 @@ export const deleteWorkers = (props, workers, hideActivityIndicator) => {
   try {
     workers.forEach(worker => {
       if (worker.isSelected) {
-        DBUsers.doc(worker.uid)
-          .delete()
-          .catch(error => {
-            console.log(error);
+        axios
+          .post(
+            "https://us-central1-garbage-collector-react.cloudfunctions.net/deleteUser",
+            {
+              user: worker
+            }
+          )
+          .then(() => {
+            props.dispatch(deleteWorker(worker));
+            hideActivityIndicator();
+            Snackbar.show({
+              title: "Deleted successfully",
+              duration: Snackbar.LENGTH_LONG,
+              backgroundColor: "green",
+              color: "white"
+            });
           });
-        props.dispatch(deleteWorker(worker));
+        // DBUsers.doc(worker.uid)
+        //   .delete()
+        //   .catch(error => {
+        //     console.log(error);
+        //   });
+        // props.dispatch(deleteWorker(worker));
       }
-    });
-    hideActivityIndicator();
-    Snackbar.show({
-      title: "Deleted successfully",
-      duration: Snackbar.LENGTH_LONG,
-      backgroundColor: "green",
-      color: "white"
     });
   } catch (error) {
     console.log(erro);

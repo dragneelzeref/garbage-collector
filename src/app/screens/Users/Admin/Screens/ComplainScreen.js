@@ -74,7 +74,7 @@ class ComplainScreen extends Component {
       titleProps={{ numberOfLines: 1 }}
       titleStyle={item.isSelected ? { color: "white" } : { color: "black" }}
       leftAvatar={this.getAvatar(item)}
-      subtitle={item.gmail || item.email}
+      subtitle={item.gmail}
       subtitleProps={{ numberOfLines: 1 }}
       subtitleStyle={item.isSelected ? { color: "white" } : { color: "black" }}
       rightTitle={this.formateDate(item)}
@@ -160,7 +160,7 @@ class ComplainScreen extends Component {
                   elevation: 5
                 }}
               />
-              <Text>{this.state.complainModalDetails.email}</Text>
+              <Text>{this.state.complainModalDetails.gmail}</Text>
               <Text>{this.formateDate(this.state.complainModalDetails)}</Text>
             </View>
             <View style={{ marginTop: 8 }}>
@@ -230,10 +230,11 @@ class ComplainScreen extends Component {
     if (item.isSelected) {
       tempObj = { ...tempObj, icon: { name: "check" } };
     } else {
+      var tempTitle = item.gmail[0].toUpperCase();
       tempObj = {
         ...tempObj,
         source: { uri: item.profile_picture },
-        title: item.email[0].toUpperCase()
+        title: tempTitle
       };
     }
     return tempObj;
@@ -286,7 +287,7 @@ class ComplainScreen extends Component {
           complainModal: true,
           complainModalDetails: {
             ...complain,
-            title: complain.email[0].toUpperCase()
+            title: complain.gmail[0].toUpperCase()
           }
         },
         () => {

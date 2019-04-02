@@ -137,7 +137,7 @@ class ComplainScreen extends Component {
     this.validateEmail();
     if (this.state.complainError === null && this.state.emailError === null) {
       sendComplain({
-        email: this.state.email,
+        gmail: this.state.email,
         complain: this.state.complain,
         ...this.props.user
       });
