@@ -1,19 +1,110 @@
-import { createAppContainer, createDrawerNavigator } from "react-navigation";
+import React from "react";
+import {
+  createAppContainer,
+  createDrawerNavigator,
+  createMaterialTopTabNavigator,
+  createStackNavigator
+} from "react-navigation";
 import HomeScreen from "./Screens/HomeScreen";
 import ProfileScreen from "../ProfileScreen";
 import CustomeDrawerCompoent from "../CustomeDrawerCompoent";
 import ComplainScreen from "./Screens/ComplainScreen";
 
+import WorkersScreen from "./Screens/WorkersScreen";
+import UsersScreen from "./Screens/UsersScreen";
+
+import Worker from "./Screens/Worker";
+import User from "./Screens/User";
+
+import Icon from "react-native-vector-icons/Ionicons";
+
+const UsersTabNavigator = createMaterialTopTabNavigator(
+  {
+    Workers: {
+      screen: WorkersScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="ios-navigate" color={tintColor} size={24} />
+        )
+      }
+    },
+    Users: {
+      screen: UsersScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="ios-person" color={tintColor} size={24} />
+        )
+      }
+    }
+  },
+  {
+    tabBarPosition: "bottom",
+    tabBarOptions: {
+      activeTintColor: "green",
+      inactiveTintColor: "black",
+      style: {
+        backgroundColor: "white",
+        borderRadius: 12,
+        elevation: 10
+      },
+      indicatorStyle: {
+        height: 0
+      },
+      showIcon: true,
+      upperCaseLabel: false
+    }
+  }
+);
+
+const Users = createStackNavigator({
+  Workers: {
+    screen: UsersTabNavigator,
+    navigationOptions: {
+      header: () => null
+    }
+  },
+  Worker: {
+    screen: Worker,
+    navigationOptions: {
+      header: () => null
+    }
+  },
+  User: {
+    screen: User,
+    navigationOptions: {
+      header: () => null
+    }
+  }
+});
+
 const Drawer = createDrawerNavigator(
   {
     Home: {
-      screen: HomeScreen
+      screen: HomeScreen,
+      navigationOptions: {
+        drawerIcon: ({ tintColor }) => (
+          <Icon name="ios-home" color={tintColor} size={24} />
+        )
+      }
     },
     Profile: {
       screen: ProfileScreen
     },
     Complains: {
-      screen: ComplainScreen
+      screen: ComplainScreen,
+      navigationOptions: {
+        drawerIcon: ({ tintColor }) => (
+          <Icon name="ios-send" color={tintColor} size={24} />
+        )
+      }
+    },
+    Users: {
+      screen: Users,
+      navigationOptions: {
+        drawerIcon: ({ tintColor }) => (
+          <Icon name="ios-people" color={tintColor} size={24} />
+        )
+      }
     }
   },
   {

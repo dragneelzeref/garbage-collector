@@ -27,11 +27,6 @@ import {
 } from "../../../../redux/reducers/LocalLocation";
 
 class HomeScreen extends Component {
-  static navigationOptions = {
-    drawerIcon: ({ tintColor }) => (
-      <Icon name="home" color={tintColor} size={20} />
-    )
-  };
   state = {
     region: {
       latitude: latitude,

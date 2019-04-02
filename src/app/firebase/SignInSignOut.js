@@ -68,20 +68,21 @@ export const signIn = async props => {
               return result.user.uid;
             })
             .then(userId => {
-              axios
-                .post(
-                  "https://us-central1-garbage-collector-react.cloudfunctions.net/getLoggedInUserInfo",
-                  { userId: userId }
-                )
-                .then(result => {
-                  AsyncStorage.setItem(
-                    "user",
-                    JSON.stringify(result.data),
-                    error => {
-                      console.log(error);
-                    }
-                  );
-                  if (props.user.user_type != result.data.user_type) {
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(userId)
+                .get()
+                .then(doc => {
+                  const data = doc.data();
+
+                  AsyncStorage.setItem("user", JSON.stringify(data), error => {
+                    console.log(error);
+                  }).then(() => {
+                    props.dispatch(getLoggedInUserInfo(data));
+                  });
+
+                  if (props.user.user_type != data.user_type) {
                   } else {
                     if (props.activeItemKey === "Profile") {
                       props.navigation.dispatch(DrawerActions.closeDrawer());
@@ -91,12 +92,37 @@ export const signIn = async props => {
                   }
                   StatusBar.setBackgroundColor("rgba(255,255,255,0)", true);
                   props.dispatch(toggleCustomeDrawerOverlay());
-                  props.dispatch(getLoggedInUserInfo(result.data));
-                })
-
-                .catch(error => {
-                  console.log(error);
                 });
+
+              // axios
+              //   .post(
+              //     "https://us-central1-garbage-collector-react.cloudfunctions.net/getLoggedInUserInfo",
+              //     { userId: userId }
+              //   )
+              //   .then(result => {
+              //     AsyncStorage.setItem(
+              //       "user",
+              //       JSON.stringify(result.data),
+              //       error => {
+              //         console.log(error);
+              //       }
+              //     );
+              //     if (props.user.user_type != result.data.user_type) {
+              //     } else {
+              //       if (props.activeItemKey === "Profile") {
+              //         props.navigation.dispatch(DrawerActions.closeDrawer());
+              //       } else {
+              //         props.navigation.navigate("Profile");
+              //       }
+              //     }
+              //     StatusBar.setBackgroundColor("rgba(255,255,255,0)", true);
+              //     props.dispatch(toggleCustomeDrawerOverlay());
+              //     props.dispatch(getLoggedInUserInfo(result.data));
+              //   })
+
+              //   .catch(error => {
+              //     console.log(error);
+              //   });
             })
             .catch(error => {
               // GoogleSignin.signOut();

@@ -4,6 +4,7 @@ import UserReducer from "../reducers/UserReducer";
 import OverlayConfigReducers from "../reducers/OverlayConfigReducers";
 import LocalLocation from "../reducers/LocalLocation";
 import ComplainReducers from "../reducers/ComplainReducers";
+import WorkersUsersReducers from "../reducers/WorkersUsersReducers";
 
 import thunk from "redux-thunk";
 
@@ -14,7 +15,8 @@ export default () => {
         user: UserReducer,
         overlays: OverlayConfigReducers,
         localLocation: LocalLocation,
-        complains: ComplainReducers
+        complains: ComplainReducers,
+        workersUsers: WorkersUsersReducers
       },
       applyMiddleware(thunk)
     )

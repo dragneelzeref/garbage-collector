@@ -5,13 +5,27 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  StatusBar
 } from "react-native";
-import { Button, Header, ListItem } from "react-native-elements";
+import {
+  Button,
+  Header,
+  ListItem,
+  Overlay,
+  Card,
+  Avatar,
+  Input
+} from "react-native-elements";
 
 import Icon from "react-native-vector-icons/FontAwesome";
 
-import { getComplains, deleteComplains } from "../../../../firebase/Complains";
+import {
+  getComplains,
+  deleteComplains,
+  readComplain,
+  deleteSingleComplain
+} from "../../../../firebase/Complains";
 
 import { connect } from "react-redux";
 
@@ -24,19 +38,15 @@ const edit = "edit";
 const del = "delete";
 
 class ComplainScreen extends Component {
-  static navigationOptions = {
-    drawerIcon: ({ tintColor }) => (
-      <Icon name="send" color={tintColor} size={20} />
-    )
-  };
-
   state = {
     loading: true,
     complains: [],
     selectedCount: 0,
     leftHeaderIcon: menu,
     rightHeaderIcon: edit,
-    refrash: false
+    refrash: false,
+    complainModal: false,
+    complainModalDetails: ""
   };
   componentDidMount() {
     getComplains(this.props, this.stopActivityIndicator);
@@ -74,6 +84,9 @@ class ComplainScreen extends Component {
       onLongPress={() => {
         this.selectItem(item);
       }}
+      onPress={() => {
+        this.listOnClick(item);
+      }}
       containerStyle={{
         borderRadius: 4,
         marginBottom: 1,
@@ -82,16 +95,6 @@ class ComplainScreen extends Component {
       }}
     />
   );
-
-  renderFooter = () => {
-    if (!this.state.loading) return null;
-
-    return (
-      <View style={{ paddingVertical: 20 }}>
-        <ActivityIndicator animating size="large" />
-      </View>
-    );
-  };
 
   render() {
     return (
@@ -122,13 +125,67 @@ class ComplainScreen extends Component {
           renderItem={this.renderItem}
           extraData={this.state.complains}
           ListFooterComponent={this.renderFooter}
-          onEndReached={() => {
-            getComplains(this.props, this.stopActivityIndicator);
-          }}
-          onEndReachedThreshold={0}
-          refreshing={this.state.refrash}
+          // onEndReached={() => {
+          //   getComplains(this.props, this.stopActivityIndicator);
+          // }}
+          // onEndReachedThreshold={0}
           style={{ margin: 8, backgroundColor: "rgba(0,0,0,0)" }}
+          refreshing={this.state.refrash}
+          onRefresh={() => {
+            this.setState({ refrash: true });
+          }}
         />
+
+        <Overlay
+          animated={true}
+          animationType="slide"
+          isVisible={this.state.complainModal}
+          onBackdropPress={() => {
+            this.setState({ complainModal: false });
+            StatusBar.setBackgroundColor("rgba(0,0,0,0)", true);
+          }}
+          height="auto"
+        >
+          <View style={styles.overlayComplain}>
+            <View style={styles.overlayAvatarContainer}>
+              <Avatar
+                rounded
+                source={{
+                  uri: this.state.complainModalDetails.profile_picture
+                }}
+                title={this.state.complainModalDetails.title}
+                overlayContainerStyle={{
+                  backgroundColor: this.state.complainModalDetails
+                    .backgroundColor,
+                  elevation: 5
+                }}
+              />
+              <Text>{this.state.complainModalDetails.email}</Text>
+              <Text>{this.formateDate(this.state.complainModalDetails)}</Text>
+            </View>
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                Complain:
+              </Text>
+              <Text style={{ marginTop: 8 }}>
+                {this.state.complainModalDetails.complain}
+              </Text>
+            </View>
+            <Button
+              raised
+              containerStyle={{ marginTop: 8 }}
+              buttonStyle={{ backgroundColor: "red" }}
+              title="Delete"
+              onPress={() => {
+                deleteSingleComplain(
+                  this.props,
+                  this.state.complainModalDetails,
+                  this.hideOverlay
+                );
+              }}
+            />
+          </View>
+        </Overlay>
         {/* <Button
           onPress={() => {
             getComplains(this.props, this.stopActivityIndicator);
@@ -138,6 +195,20 @@ class ComplainScreen extends Component {
       </View>
     );
   }
+
+  hideOverlay = () => {
+    this.setState({ complainModal: false, complainModalDetails: "" });
+  };
+
+  renderFooter = () => {
+    if (!this.state.loading) return null;
+
+    return (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator animating size="large" />
+      </View>
+    );
+  };
 
   formateDate = item => {
     return new Date(item.time).toLocaleDateString("en-GB", {
@@ -161,7 +232,7 @@ class ComplainScreen extends Component {
     } else {
       tempObj = {
         ...tempObj,
-        source: item.profile_picture,
+        source: { uri: item.profile_picture },
         title: item.email[0].toUpperCase()
       };
     }
@@ -180,10 +251,15 @@ class ComplainScreen extends Component {
       });
     }
 
+    var bg = "white";
+    if (item.read) {
+      bg = "#ebebeb";
+    }
+
     item.isSelected = !item.isSelected;
     item.style = item.isSelected
       ? { backgroundColor: "green" }
-      : { backgroundColor: "white" };
+      : { backgroundColor: bg };
     const index = this.state.complains.findIndex(res => res.id === item.id);
     this.state.complains[index] = item;
     this.setState({
@@ -192,6 +268,35 @@ class ComplainScreen extends Component {
 
     //chage header icons
     this.headerLeftIcon();
+  };
+
+  listOnClick = complain => {
+    if (this.state.leftHeaderIcon === menu) {
+      complain.read = true;
+      complain.style = complain.read
+        ? { backgroundColor: "#ebebeb" }
+        : { backgroundColor: "white" };
+      const index = this.state.complains.findIndex(
+        res => res.id === complain.id
+      );
+      this.state.complains[index] = complain;
+      this.setState(
+        {
+          complains: this.state.complains,
+          complainModal: true,
+          complainModalDetails: {
+            ...complain,
+            title: complain.email[0].toUpperCase()
+          }
+        },
+        () => {
+          readComplain(complain);
+          StatusBar.setBackgroundColor("rgba(0,0,0,0.4)", true);
+        }
+      );
+    } else {
+      this.selectItem(complain);
+    }
   };
 
   headerLeftIcon = () => {
@@ -223,8 +328,13 @@ class ComplainScreen extends Component {
       //diselect all
       else {
         this.state.complains.forEach((item, index) => {
+          var bg = "white";
+          if (item.read) {
+            bg = "#ebebeb";
+          }
           item.isSelected = false;
-          item.style = { backgroundColor: "white" };
+
+          item.style = { backgroundColor: bg };
           // const index = this.state.complains.findIndex(res => res.id === item.id);
           this.state.complains[index] = item;
         });
@@ -271,5 +381,13 @@ const styles = StyleSheet.create({
   },
   selectedItem: {
     backgroundColor: "rgba(0,0,255,0.1)"
+  },
+  overlayComplain: {
+    alignContent: "space-between"
+  },
+  overlayAvatarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
   }
 });
