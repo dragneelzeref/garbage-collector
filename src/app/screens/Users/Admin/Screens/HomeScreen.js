@@ -9,30 +9,44 @@ import {
   ToastAndroid
 } from "react-native";
 
-import { Button } from "react-native-elements";
+import { Button, Avatar, Overlay } from "react-native-elements";
+
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import AlertIcon from "react-native-vector-icons/MaterialCommunityIcons";
+
+import MapView, {
+  PROVIDER_GOOGLE,
+  Marker,
+  Polygon,
+  Callout
+} from "react-native-maps";
 
 import { connect } from "react-redux";
 import {
   setGpsOn,
   setCoords
 } from "../../../../redux/actions/LocalLocationActions";
-
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-import AlertIcon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import MapView, { PROVIDER_GOOGLE, Marker, Polygon } from "react-native-maps";
-
-import NetworkOverlay from "../../NetworkOverlay";
-
-import { getLocation } from "../../../../components/Location/Listener";
-
 import {
   latitudeDelta,
   longitudeDelta,
   latitude,
   longitude
 } from "../../../../redux/reducers/LocalLocation";
+
+import geolib from "geolib";
+
+import NetworkOverlay from "../../NetworkOverlay";
+
+import { getLocation } from "../../../../components/Location/Listener";
+
+import WorkersOverlay from "./WorkersOverlay";
+
+import {
+  sendPolygon,
+  getPolygons,
+  deletePolygon,
+  addWorkerToPolygon
+} from "../../../../firebase/Polygons";
 
 const menu = "menu";
 const check = "check";
@@ -49,18 +63,21 @@ class HomeScreen extends Component {
     },
     headerLeftIcon: menu,
     headerRightIcon: bell,
+    workers: [],
+
+    woverlay: false,
     //polygon
 
-    polygons: [],
     editing: false,
-    currentPolygon: [],
-    firstCordinate: false
+    editingPolygon: [],
+    firstCordinate: false,
+    selectedPolygon: []
   };
-  componentDidUpdate(prevProps) {
-    // if (prevProps.localLocation.coords != this.props.localLocation.coords) {
-    //   this.moveRegion(this.props.localLocation.coords);
-    // }
+
+  componentDidMount() {
+    getPolygons(this.props);
   }
+  componentDidUpdate(prevProps) {}
   render() {
     const mapOptions = {
       scrollEnabled: true
@@ -86,6 +103,7 @@ class HomeScreen extends Component {
           }}
           initialRegion={this.state.region}
           showsUserLocation
+          showsMyLocationButton={false}
           showsBuildings={true}
           moveOnMarkerPress={true}
           onUserLocationChange={e => {
@@ -99,10 +117,10 @@ class HomeScreen extends Component {
           {...mapOptions}
         >
           {/* saved polygones */
-          this.state.polygons.map((polygon, index) => (
+          this.props.polygons.map(polygon => (
             <Polygon
-              key={index}
-              coordinates={polygon}
+              key={polygon.pid}
+              coordinates={polygon.coordinates}
               strokeColor="rgba(0,0,255,0.2)"
               fillColor="rgba(0,0,255,0.2)"
             />
@@ -110,12 +128,47 @@ class HomeScreen extends Component {
           {/* current editing polygon */
           this.state.firstCordinate && (
             <Polygon
-              coordinates={this.state.currentPolygon}
+              coordinates={this.state.editingPolygon}
               strokeColor="rgba(255,0,0,0.2)"
               fillColor="rgba(255,0,0,0.2)"
             />
           )}
+          {/* markers */
+          this.props.polygons.map((current, index) => (
+            <Marker
+              key={current.pid}
+              coordinate={current.center}
+              calloutOffset={{ x: 0, y: 28 }}
+              onDeselect={() => this.setState({ selectedPolygon: {} })}
+            >
+              <Avatar
+                rounded
+                source={{
+                  uri: current.worker ? current.worker.profile_picture : null
+                }}
+                icon={{ name: "edit", color: "black" }}
+                size="medium"
+                overlayContainerStyle={{
+                  backgroundColor: "rgba(255,255,255,1)"
+                }}
+              />
+              <Callout
+                tooltip
+                style={styles.calloutStyle}
+                onPress={() => this.polygonMarkerClick(current)}
+              >
+                <Button
+                  buttonStyle={{ backgroundColor: "white" }}
+                  titleStyle={{ color: "black" }}
+                  title={
+                    current.worker ? current.worker.full_name : "Add Worker"
+                  }
+                />
+              </Callout>
+            </Marker>
+          ))}
         </MapView>
+        {/* header */}
         <View style={styles.headerContainer}>
           <MaterialIcons
             name={this.state.headerLeftIcon}
@@ -174,6 +227,18 @@ class HomeScreen extends Component {
           />
         </View>
 
+        <Overlay
+          animated={true}
+          animationType="slide"
+          isVisible={this.state.woverlay}
+          onBackdropPress={this.overlayBackPress}
+          overlayStyle={{ padding: 0 }}
+        >
+          <WorkersOverlay
+            deleteRoute={this.deleteRoute}
+            addWorker={this.addWorker}
+          />
+        </Overlay>
         {/* <NetworkOverlay /> */}
       </SafeAreaView>
     );
@@ -198,19 +263,21 @@ class HomeScreen extends Component {
         headerLeftIcon: menu,
         headerRightIcon: bell,
         editing: false,
-        currentPolygon: [],
+        editingPolygon: [],
         firstCordinate: false
       });
     }
   };
   headerRightIconClick = () => {
+    var temp = geolib.getCenterOfBounds(this.state.editingPolygon);
+
     if (this.state.headerRightIcon === check) {
+      sendPolygon(this.props, this.state.editingPolygon);
       this.setState({
         headerLeftIcon: menu,
         headerRightIcon: bell,
         editing: false,
-        polygons: [...this.state.polygons, this.state.currentPolygon],
-        currentPolygon: [],
+        editingPolygon: [],
         firstCordinate: false
       });
     }
@@ -231,24 +298,52 @@ class HomeScreen extends Component {
     if (this.state.editing) {
       if (!this.state.firstCordinate) {
         this.setState({
-          currentPolygon: [
-            ...this.state.currentPolygon,
+          editingPolygon: [
+            ...this.state.editingPolygon,
             e.nativeEvent.coordinate
           ],
           firstCordinate: true
         });
       }
       this.setState({
-        currentPolygon: [...this.state.currentPolygon, e.nativeEvent.coordinate]
+        editingPolygon: [...this.state.editingPolygon, e.nativeEvent.coordinate]
       });
     }
+  };
+  polygonMarkerClick = curentPolygon => {
+    this.setState({ woverlay: true, selectedPolygon: curentPolygon });
+    StatusBar.setBackgroundColor("rgba(0,0,0,0.4)", true);
+  };
+  overlayBackPress = () => {
+    this.setState({ woverlay: false });
+    StatusBar.setBackgroundColor("rgba(0,0,0,0)", true);
+  };
+  deleteRoute = () => {
+    if (this.state.selectedPolygon != null) {
+      deletePolygon(
+        this.props,
+        this.state.selectedPolygon,
+        this.overlayBackPress
+      );
+    }
+  };
+  addWorker = (worker = null) => {
+    addWorkerToPolygon(
+      this.props,
+      this.state.selectedPolygon,
+      worker,
+      this.overlayBackPress
+    );
   };
 }
 
 const mapStateToProps = state => {
   return {
+    user: state.user,
+    workersUsers: state.workersUsers,
     overlays: state.overlays,
-    localLocation: state.localLocation
+    localLocation: state.localLocation,
+    polygons: state.polygons
   };
 };
 export default connect(mapStateToProps)(HomeScreen);
@@ -286,5 +381,17 @@ const styles = StyleSheet.create({
     // right: 10
     alignSelf: "flex-end",
     flexDirection: "column"
+  },
+  calloutStyle: {
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0)",
+    width: 200
+  },
+  calloutPopupStyle: {
+    backgroundColor: "rgba(255,255,255,1)",
+    borderRadius: 8,
+    elevation: 10,
+    padding: 15
   }
 });

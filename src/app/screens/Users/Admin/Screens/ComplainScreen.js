@@ -161,7 +161,7 @@ class ComplainScreen extends Component {
                 }}
               />
               <Text>{this.state.complainModalDetails.gmail}</Text>
-              <Text>{this.formateDate(this.state.complainModalDetails)}</Text>
+              {/* <Text>{this.formateDate(this.state.complainModalDetails)}</Text> */}
             </View>
             <View style={{ marginTop: 8 }}>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
@@ -389,6 +389,6 @@ const styles = StyleSheet.create({
   overlayAvatarContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-evenly"
   }
 });

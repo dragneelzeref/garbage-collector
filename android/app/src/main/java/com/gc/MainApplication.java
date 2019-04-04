@@ -3,14 +3,12 @@ package com.gc;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import io.invertase.firebase.RNFirebasePackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.heanoria.library.reactnative.locationenabler.RNAndroidLocationEnablerPackage;
 import com.levelasquez.androidopensettings.AndroidOpenSettingsPackage;
 import com.azendoo.reactnativesnackbar.SnackbarPackage;
-import br.com.classapp.RNSensitiveInfo.RNSensitiveInfoPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -36,14 +34,12 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNFirebasePackage(),
             new LinearGradientPackage(),
             new RNFusedLocationPackage(),
             new MapsPackage(),
             new RNAndroidLocationEnablerPackage(),
             new AndroidOpenSettingsPackage(),
             new SnackbarPackage(),
-            new RNSensitiveInfoPackage(),
             new RNGoogleSigninPackage(),
             new VectorIconsPackage(),
             // new RNFirebaseAuthPackage(),

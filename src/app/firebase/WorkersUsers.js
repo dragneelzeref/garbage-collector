@@ -20,13 +20,15 @@ import {
 
 const DBUsers = firebase.firestore().collection("users");
 
-export const getWorkers = (props, hideFooterLoading) => {
+export const getWorkers = (props, hideFooterLoading = null) => {
   DBUsers.where("user_type", "==", "Worker")
     .get()
     .then(snapshot => {
       if (snapshot.empty) {
         props.dispatch(storeWorker());
-        hideFooterLoading();
+        if (hideFooterLoading != null) {
+          hideFooterLoading();
+        }
       }
       snapshot.docs.forEach(doc => {
         props.dispatch(
