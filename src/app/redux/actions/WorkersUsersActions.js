@@ -19,9 +19,37 @@ export const updateTypeAction = (user, newType) => {
   };
 };
 
-export const deleteWorker = worker => {
+export const deleteWorkerAndUserAction = user => {
   return {
-    type: "DELETE_WORKER",
-    worker: worker
+    type: "DELETE_WORKER_AND_USER",
+    user: user
+  };
+};
+
+export const ModifyAction = (user = null) => {
+  return {
+    type: "MODIFY",
+    user
+  };
+};
+
+export const getAllUsersAction = (user = null) => {
+  return {
+    type: "GET_ALL_USERS",
+    user
+  };
+};
+
+export const deleteAllUsersAction = (user = null) => {
+  return {
+    type: "DELETE_ALL_USERS",
+    user
+  };
+};
+
+export const updateAllUsersAction = (user = null) => {
+  return {
+    type: "UDATE_ALL_USERS",
+    user
   };
 };

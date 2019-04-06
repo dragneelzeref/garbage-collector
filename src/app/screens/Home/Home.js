@@ -18,6 +18,8 @@ import {
   removeLocationUpdates
 } from "../../components/Location/Listener";
 
+import { getAlreadyLoggedInUser } from "../../NewFirebase/Login/SignInSignOut";
+
 class Home extends Component {
   state = {
     Drawer: DrawerUser

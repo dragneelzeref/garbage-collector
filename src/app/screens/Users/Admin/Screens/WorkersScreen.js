@@ -15,7 +15,11 @@ import { connect } from "react-redux";
 
 import TouchableScale from "react-native-touchable-scale"; // https://github.com/kohver/react-native-touchable-scale
 
-import { getWorkers, deleteWorkers } from "../../../../firebase/WorkersUsers";
+import {
+  getAllUsers,
+  deleteWorkerAndUser,
+  unsubscriber
+} from "../../../../NewFirebase/Admin/WorkersUsers";
 
 //icon name constant
 const menu = "menu";
@@ -35,15 +39,19 @@ class WorkersScreen extends Component {
     SearchText: null
   };
   componentDidMount() {
-    getWorkers(this.props, this.hideFooterLoading);
+    // getAllUsers(this.props, this.hideFooterLoading);
   }
   componentDidUpdate(prevProps) {
-    if (prevProps.workersUsers.workers != this.props.workersUsers.workers) {
+    if (this.state.workers != this.props.workersUsers.workers) {
       this.setState({
         workers: this.props.workersUsers.workers,
         footerLoading: false
       });
     }
+  }
+
+  componentWillUnmount() {
+    unsubscriber();
   }
 
   renderItem = ({ item }) => (
@@ -188,7 +196,7 @@ class WorkersScreen extends Component {
   };
   listOnPress = item => {
     if (this.state.headerLeftIcon === menu) {
-      this.props.navigation.navigate("Worker", { worker: item });
+      this.props.navigation.navigate("User", { User: item });
     } else {
       this.listLongPress(item);
     }
@@ -230,7 +238,11 @@ class WorkersScreen extends Component {
       this.setState({ headerLeftIcon: check, headerRightIcon: del });
     } else {
       this.setState({ processModel: true });
-      deleteWorkers(this.props, this.state.workers, this.hideActivityIndicator);
+      deleteWorkerAndUser(
+        this.props,
+        this.state.workers,
+        this.hideActivityIndicator
+      );
       this.setState({ headerLeftIcon: menu, headerRightIcon: edit });
     }
   };
@@ -241,7 +253,7 @@ class WorkersScreen extends Component {
 
   refreshAction = () => {
     this.setState({ refresh: true }, () => {
-      getWorkers(this.props, this.hideFooterLoading);
+      getAllUsers(this.props, this.hideFooterLoading);
     });
     this.setState({ refresh: false });
   };

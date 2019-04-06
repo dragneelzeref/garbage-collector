@@ -15,10 +15,7 @@ import { DrawerItems, SafeAreaView } from "react-navigation";
 
 import { connect } from "react-redux";
 
-import { signIn } from "../../firebase/SignInSignOut";
-// import ignoreWarnings from "react-native-ignore-warnings";
-
-// ignoreWarnings("Setting a timer");
+import { signIn, signOut } from "../../NewFirebase/Login/SignInSignOut";
 
 const CustomeDrawerCompoent = props => (
   <ScrollView>
@@ -37,7 +34,7 @@ const CustomeDrawerCompoent = props => (
       <TouchableOpacity
         style={styles.profile}
         onPress={() => {
-          signIn(props);
+          signIn(props, signOut);
         }}
       >
         <View style={styles.profileContainer}>

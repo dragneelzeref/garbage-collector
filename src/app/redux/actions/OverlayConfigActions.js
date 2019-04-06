@@ -1,6 +1,7 @@
-export const toggleCustomeDrawerOverlay = () => {
+export const toggleCustomeDrawerOverlay = (toggle = null) => {
   return {
-    type: "TOGGLE_CUSTOME_DRAWER_OVERLAY"
+    type: "TOGGLE_CUSTOME_DRAWER_OVERLAY",
+    toggle: toggle
   };
 };
 

@@ -1,5 +1,4 @@
-import { User } from "../../navigation/UserConstants/UserConstant";
-export const getLoggedInUserInfo = (user = {}) => {
+export const getLoggedInUserInfo = (user = null) => {
   return { type: "GET_LOGGED_IN_USER_INFO", user };
 };
 export const signOutUser = () => {

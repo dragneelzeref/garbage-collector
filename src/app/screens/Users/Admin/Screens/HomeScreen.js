@@ -46,7 +46,7 @@ import {
   getPolygons,
   deletePolygon,
   addWorkerToPolygon
-} from "../../../../firebase/Polygons";
+} from "../../../../NewFirebase/Admin/Polygons";
 
 const menu = "menu";
 const check = "check";

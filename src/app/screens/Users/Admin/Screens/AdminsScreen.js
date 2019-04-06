@@ -16,10 +16,12 @@ import { connect } from "react-redux";
 import TouchableScale from "react-native-touchable-scale"; // https://github.com/kohver/react-native-touchable-scale
 
 import {
-  deleteWorkerAndUser,
   getAllUsers,
+  deleteWorkerAndUser,
   unsubscriber
 } from "../../../../NewFirebase/Admin/WorkersUsers";
+
+import Snackbar from "react-native-snackbar";
 
 //icon name constant
 const menu = "menu";
@@ -27,12 +29,12 @@ const check = "check";
 const edit = "edit";
 const del = "delete";
 
-class UsersScreen extends Component {
+class AdminScreen extends Component {
   state = {
     headerLeftIcon: menu,
     headerRightIcon: edit,
     refresh: false,
-    users: [],
+    admins: [],
     selectedCount: 0,
     processModel: false,
     footerLoading: true,
@@ -42,9 +44,9 @@ class UsersScreen extends Component {
     getAllUsers(this.props, this.hideFooterLoading);
   }
   componentDidUpdate(prevProps) {
-    if (this.state.users != this.props.workersUsers.users) {
+    if (this.state.admins != this.props.workersUsers.admins) {
       this.setState({
-        users: this.props.workersUsers.users,
+        admins: this.props.workersUsers.admins,
         footerLoading: false
       });
     }
@@ -101,7 +103,7 @@ class UsersScreen extends Component {
       onChangeText={text => {
         this.setState({ SearchText: text }, () => {
           if (text != "" || null) {
-            const temp = this.state.users.filter(worker => {
+            const temp = this.state.admins.filter(worker => {
               return (worker.full_name
                 .toLowerCase()
                 .search(text.toLowerCase()) ||
@@ -109,9 +111,9 @@ class UsersScreen extends Component {
                 ? true
                 : false;
             });
-            this.setState({ users: temp });
+            this.setState({ admins: temp });
           } else {
-            this.setState({ users: this.props.workersUsers.users });
+            this.setState({ admins: this.props.workersUsers.admins });
           }
         });
       }}
@@ -129,7 +131,7 @@ class UsersScreen extends Component {
             onPress: this.headerLeftAction
           }}
           centerComponent={{
-            text: "Users",
+            text: "Admins",
             style: { color: "#000", fontSize: 16 }
           }}
           rightComponent={{
@@ -142,8 +144,8 @@ class UsersScreen extends Component {
 
         <FlatList
           keyExtractor={item => item.uid.toString()}
-          data={this.state.users}
-          extraData={this.state.users}
+          data={this.state.admins}
+          extraData={this.state.admins}
           renderItem={this.renderItem}
           style={{ margin: 8, backgroundColor: "rgba(0,0,0,0)" }}
           refreshing={this.state.refresh}
@@ -166,31 +168,40 @@ class UsersScreen extends Component {
   }
 
   listLongPress = item => {
-    if (item.isSelected) {
-      this.setState({
-        selectedCount:
-          this.state.selectedCount > 0 ? this.state.selectedCount - 1 : 0
+    if (item.su === true) {
+      Snackbar.show({
+        title: "Super User Can't be deleted",
+        duration: Snackbar.LENGTH_LONG,
+        backgroundColor: "red",
+        color: "white"
       });
     } else {
+      if (item.isSelected) {
+        this.setState({
+          selectedCount:
+            this.state.selectedCount > 0 ? this.state.selectedCount - 1 : 0
+        });
+      } else {
+        this.setState({
+          selectedCount: this.state.selectedCount + 1
+        });
+      }
+
+      item.isSelected = !item.isSelected;
+      item.style = item.isSelected
+        ? { backgroundColor: "green" }
+        : { backgroundColor: "white" };
+      const index = this.state.admins.findIndex(res => res.id === item.id);
+      this.state.admins[index] = item;
       this.setState({
-        selectedCount: this.state.selectedCount + 1
+        admins: this.state.admins
       });
-    }
 
-    item.isSelected = !item.isSelected;
-    item.style = item.isSelected
-      ? { backgroundColor: "green" }
-      : { backgroundColor: "white" };
-    const index = this.state.users.findIndex(res => res.id === item.id);
-    this.state.users[index] = item;
-    this.setState({
-      users: this.state.users
-    });
-
-    if (this.state.selectedCount === 0) {
-      this.setState({ headerLeftIcon: menu, headerRightIcon: edit });
-    } else {
-      this.setState({ headerLeftIcon: check, headerRightIcon: del });
+      if (this.state.selectedCount === 0) {
+        this.setState({ headerLeftIcon: menu, headerRightIcon: edit });
+      } else {
+        this.setState({ headerLeftIcon: check, headerRightIcon: del });
+      }
     }
   };
   listOnPress = item => {
@@ -205,27 +216,29 @@ class UsersScreen extends Component {
     if (this.state.headerLeftIcon === menu) {
       this.props.navigation.openDrawer();
     } else {
-      if (this.state.selectedCount === this.state.users.length) {
-        this.state.users.forEach((workser, index) => {
+      if (this.state.selectedCount === this.state.admins.length) {
+        this.state.admins.forEach((workser, index) => {
           (workser.isSelected = false),
             (workser.style = { backgroundColor: "white" });
-          this.state.users[index] = workser;
+          this.state.admins[index] = workser;
         });
         this.setState({
-          users: this.state.users,
+          admins: this.state.admins,
           headerLeftIcon: menu,
           selectedCount: 0,
           headerRightIcon: edit
         });
       } else {
-        this.state.users.forEach((workser, index) => {
-          (workser.isSelected = true),
-            (workser.style = { backgroundColor: "green" });
-          this.state.users[index] = workser;
+        this.state.admins.forEach((workser, index) => {
+          (workser.isSelected = workser.su ? false : true),
+            (workser.style = workser.su
+              ? { backgroundColor: "white" }
+              : { backgroundColor: "green" });
+          this.state.admins[index] = workser;
         });
         this.setState({
-          users: this.state.users,
-          selectedCount: this.state.users.length,
+          admins: this.state.admins,
+          selectedCount: this.state.admins.length,
           headerLeftIcon: check,
           headerRightIcon: del
         });
@@ -239,7 +252,7 @@ class UsersScreen extends Component {
       this.setState({ processModel: true });
       deleteWorkerAndUser(
         this.props,
-        this.state.users,
+        this.state.admins,
         this.hideActivityIndicator
       );
       this.setState({ headerLeftIcon: menu, headerRightIcon: edit });
@@ -250,17 +263,17 @@ class UsersScreen extends Component {
     this.setState({ processModel: false });
   };
 
-  hideFooterLoading = () => {
-    this.setState({
-      footerLoading: false
-    });
-  };
-
   refreshAction = () => {
     this.setState({ refresh: true }, () => {
       getAllUsers(this.props, this.hideFooterLoading);
     });
     this.setState({ refresh: false });
+  };
+
+  hideFooterLoading = () => {
+    this.setState({
+      footerLoading: false
+    });
   };
 
   renderFooter = () => {
@@ -281,7 +294,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(UsersScreen);
+export default connect(mapStateToProps)(AdminScreen);
 
 const styles = StyleSheet.create({
   container: {

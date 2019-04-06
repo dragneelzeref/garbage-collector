@@ -1,21 +1,15 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  Modal,
-  ActivityIndicator,
-  Dimensions
-} from "react-native";
-import { Header, ListItem, Button, SearchBar } from "react-native-elements";
+import { View, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { ListItem, Button, SearchBar } from "react-native-elements";
 
 import { connect } from "react-redux";
 
 import TouchableScale from "react-native-touchable-scale"; // https://github.com/kohver/react-native-touchable-scale
 
-import { getWorkers, deleteWorkers } from "../../../../firebase/WorkersUsers";
+import {
+  getAllUsers,
+  unsubscriber
+} from "../../../../NewFirebase/Admin/WorkersUsers";
 
 import Icon from "react-native-vector-icons/MaterialIcons";
 
@@ -27,8 +21,6 @@ const del = "delete";
 
 class WorkersScreen extends Component {
   state = {
-    headerLeftIcon: menu,
-    headerRightIcon: edit,
     refresh: false,
     workers: [],
     selectedCount: 0,
@@ -41,15 +33,18 @@ class WorkersScreen extends Component {
       workers: this.props.workersUsers.workers,
       footerLoading: false
     });
-    getWorkers(this.props, this.hideFooterLoading);
+    getAllUsers(this.props, this.hideFooterLoading);
   }
   componentDidUpdate(prevProps) {
-    if (prevProps.workersUsers.workers != this.props.workersUsers.workers) {
+    if (this.state.workers != this.props.workersUsers.workers) {
       this.setState({
         workers: this.props.workersUsers.workers,
         footerLoading: false
       });
     }
+  }
+  componentWillUnmount() {
+    unsubscriber();
   }
 
   renderItem = ({ item }) => (
@@ -145,7 +140,9 @@ class WorkersScreen extends Component {
             title="Route"
             buttonStyle={styles.button}
             activeOpacity={0.7}
-            onPress={this.props.deleteRoute}
+            onPress={() => {
+              this.props.deleteRoute();
+            }}
           />
         </View>
       </View>
@@ -158,7 +155,7 @@ class WorkersScreen extends Component {
 
   refreshAction = () => {
     this.setState({ refresh: true }, () => {
-      getWorkers(this.props, this.hideFooterLoading);
+      getAllUsers(this.props, this.hideFooterLoading);
     });
     this.setState({ refresh: false });
   };

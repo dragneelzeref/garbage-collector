@@ -3,9 +3,10 @@ package com.gc;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.airbnb.android.react.maps.MapsPackage;
+import io.invertase.firebase.RNFirebasePackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
-import com.airbnb.android.react.maps.MapsPackage;
 import com.heanoria.library.reactnative.locationenabler.RNAndroidLocationEnablerPackage;
 import com.levelasquez.androidopensettings.AndroidOpenSettingsPackage;
 import com.azendoo.reactnativesnackbar.SnackbarPackage;
@@ -20,7 +21,8 @@ import com.facebook.soloader.SoLoader;
 import java.util.Arrays;
 import java.util.List;
 
-// import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+ import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+ import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -34,16 +36,18 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new MapsPackage(),
+            new RNFirebasePackage(),
             new LinearGradientPackage(),
             new RNFusedLocationPackage(),
-            new MapsPackage(),
             new RNAndroidLocationEnablerPackage(),
             new AndroidOpenSettingsPackage(),
             new SnackbarPackage(),
             new RNGoogleSigninPackage(),
             new VectorIconsPackage(),
-            // new RNFirebaseAuthPackage(),
-            new RNGestureHandlerPackage()
+            new RNGestureHandlerPackage(),
+            new RNFirebaseAuthPackage(),
+            new RNFirebaseFirestorePackage()
       );
     }
 

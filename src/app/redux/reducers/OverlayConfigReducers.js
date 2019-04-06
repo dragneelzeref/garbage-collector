@@ -9,6 +9,9 @@ const OverlayConfigReducer = (
 ) => {
   switch (action.type) {
     case "TOGGLE_CUSTOME_DRAWER_OVERLAY":
+      if (action.toggle != null) {
+        return { ...state, customeDrawerOverlay: action.toggle };
+      }
       return { ...state, customeDrawerOverlay: !state.customeDrawerOverlay };
     case "TOGGLE_NETWORK_OVERLAY":
       title = action.title;

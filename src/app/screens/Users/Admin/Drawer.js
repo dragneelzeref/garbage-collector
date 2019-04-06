@@ -12,14 +12,23 @@ import ComplainScreen from "./Screens/ComplainScreen";
 
 import WorkersScreen from "./Screens/WorkersScreen";
 import UsersScreen from "./Screens/UsersScreen";
+import AdminScreen from "./Screens/AdminsScreen";
 
-import Worker from "./Screens/Worker";
+// import Worker from "./Screens/Worker";
 import User from "./Screens/User";
 
 import Icon from "react-native-vector-icons/Ionicons";
 
 const UsersTabNavigator = createMaterialTopTabNavigator(
   {
+    Users: {
+      screen: UsersScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="ios-person" color={tintColor} size={24} />
+        )
+      }
+    },
     Workers: {
       screen: WorkersScreen,
       navigationOptions: {
@@ -28,11 +37,11 @@ const UsersTabNavigator = createMaterialTopTabNavigator(
         )
       }
     },
-    Users: {
-      screen: UsersScreen,
+    Admins: {
+      screen: AdminScreen,
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => (
-          <Icon name="ios-person" color={tintColor} size={24} />
+          <Icon name="md-construct" color={tintColor} size={24} />
         )
       }
     }
@@ -57,14 +66,8 @@ const UsersTabNavigator = createMaterialTopTabNavigator(
 );
 
 const Users = createStackNavigator({
-  Workers: {
+  WorkersTab: {
     screen: UsersTabNavigator,
-    navigationOptions: {
-      header: () => null
-    }
-  },
-  Worker: {
-    screen: Worker,
     navigationOptions: {
       header: () => null
     }

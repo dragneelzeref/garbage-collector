@@ -1,10 +1,13 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Picker } from "react-native";
-import { Header, Avatar, Input } from "react-native-elements";
+import { View, Text, StyleSheet, Picker, ScrollView } from "react-native";
+import { Header, Avatar, Input, Button } from "react-native-elements";
 
 import { connect } from "react-redux";
 
-import { updateType } from "../../../../firebase/WorkersUsers";
+import {
+  updateType,
+  deleteSingleWorkerAndUser
+} from "../../../../NewFirebase/Admin/WorkersUsers";
 
 const back = "arrow-back";
 const check = "check";
@@ -26,7 +29,7 @@ class User extends Component {
   }
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Header
           placement="center"
           backgroundColor="white"
@@ -88,26 +91,86 @@ class User extends Component {
             label="Last Logged In"
             inputContainerStyle={styles.input}
           />
-          <Input
+          {/* <Input
             label="User Type"
             inputContainerStyle={styles.input}
             inputComponent={Picker}
             selectedValue={this.state.User.user_type}
             mode="dropdown"
             onValueChange={(itemValue, itemIndex) => {
+              if (itemValue != this.state.User.user_type) {
+                this.setState({
+                  User: { ...this.state.User, user_type: itemValue }
+                });
+                updateType(this.props, this.state.User, itemValue);
+              }
+            }}
+          >
+            <Picker.Item value="User" label="User" />
+            <Picker.Item value="Worker" label="Worker" />
+            <Picker.Item value="Admin" label="Admin" />
+          </Input> */}
+
+          {this.pickers()}
+        </View>
+        <Button
+          title="Delete"
+          style={{ padding: 10, color: "white" }}
+          containerStyle={{ margin: 8 }}
+          disabled={this.state.User.su ? true : false}
+          buttonStyle={{ backgroundColor: "red" }}
+          onPress={() => {
+            deleteSingleWorkerAndUser(this.props, this.state.user);
+          }}
+        />
+      </ScrollView>
+    );
+  }
+  pickers = () => {
+    if (this.state.User.su) {
+      return (
+        <Input
+          label="User Type"
+          inputContainerStyle={styles.input}
+          inputComponent={Picker}
+          selectedValue={this.state.User.user_type}
+          mode="dropdown"
+          onValueChange={(itemValue, itemIndex) => {
+            if (itemValue != this.state.User.user_type) {
               this.setState({
                 User: { ...this.state.User, user_type: itemValue }
               });
               updateType(this.props, this.state.User, itemValue);
-            }}
-          >
-            <Picker.Item value="User" label="User" />
-            <Picker.Item value="User" label="User" />
-          </Input>
-        </View>
-      </View>
-    );
-  }
+            }
+          }}
+        >
+          <Picker.Item value="Admin" label="Admin" />
+        </Input>
+      );
+    } else {
+      return (
+        <Input
+          label="User Type"
+          inputContainerStyle={styles.input}
+          inputComponent={Picker}
+          selectedValue={this.state.User.user_type}
+          mode="dropdown"
+          onValueChange={(itemValue, itemIndex) => {
+            if (itemValue != this.state.User.user_type) {
+              this.setState({
+                User: { ...this.state.User, user_type: itemValue }
+              });
+              updateType(this.props, this.state.User, itemValue);
+            }
+          }}
+        >
+          <Picker.Item value="User" label="User" />
+          <Picker.Item value="Worker" label="Worker" />
+          <Picker.Item value="Admin" label="Admin" />
+        </Input>
+      );
+    }
+  };
 }
 
 const mapStateToProps = state => {
