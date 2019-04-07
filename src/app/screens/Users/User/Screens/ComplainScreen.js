@@ -13,7 +13,7 @@ import { Header, Input, Card } from "react-native-elements";
 
 import { connect } from "react-redux";
 
-import { sendComplain } from "../../../../firebase/Complains";
+import { sendComplain } from "../../../../NewFirebase/Admin/Complains";
 
 class ComplainScreen extends Component {
   static navigationOptions = {

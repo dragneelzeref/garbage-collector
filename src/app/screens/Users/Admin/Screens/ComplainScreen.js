@@ -24,8 +24,8 @@ import {
   getComplains,
   deleteComplains,
   readComplain,
-  deleteSingleComplain
-} from "../../../../firebase/Complains";
+  unsubscriberComplaines
+} from "../../../../NewFirebase/Admin/Complains";
 
 import { connect } from "react-redux";
 
@@ -44,16 +44,14 @@ class ComplainScreen extends Component {
     selectedCount: 0,
     leftHeaderIcon: menu,
     rightHeaderIcon: edit,
-    refrash: false,
-    complainModal: false,
-    complainModalDetails: ""
+    refrash: false
   };
   componentDidMount() {
     getComplains(this.props, this.stopActivityIndicator);
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.complains != prevProps.complains) {
+    if (this.state.complains != this.props.complains) {
       this.setState({ complains: this.props.complains });
     }
     if (prevState.refrash === false && this.state.refrash === true) {
@@ -61,7 +59,9 @@ class ComplainScreen extends Component {
       this.setState({ refrash: false });
     }
   }
-
+  componentWillUnmount() {
+    unsubscriberComplaines();
+  }
   renderItem = ({ item }) => (
     <ListItem
       Component={TouchableScale}
@@ -73,7 +73,18 @@ class ComplainScreen extends Component {
       title={item.complain}
       titleProps={{ numberOfLines: 1 }}
       titleStyle={item.isSelected ? { color: "white" } : { color: "black" }}
-      leftAvatar={this.getAvatar(item)}
+      leftAvatar={
+        item.isSelected
+          ? {
+              icon: { name: check },
+              overlayContainerStyle: { backgroundColor: item.backgroundColor }
+            }
+          : {
+              source: { uri: item.profile_picture },
+              title: item.gmail ? item.gmail[0].toUpperCase() : "U",
+              overlayContainerStyle: { backgroundColor: item.backgroundColor }
+            }
+      }
       subtitle={item.gmail}
       subtitleProps={{ numberOfLines: 1 }}
       subtitleStyle={item.isSelected ? { color: "white" } : { color: "black" }}
@@ -120,85 +131,20 @@ class ComplainScreen extends Component {
           containerStyle={{ elevation: 5 }}
         />
         <FlatList
-          keyExtractor={item => item.id.toString()}
           data={this.state.complains}
           renderItem={this.renderItem}
           extraData={this.state.complains}
+          keyExtractor={item => item.id}
           ListFooterComponent={this.renderFooter}
-          // onEndReached={() => {
-          //   getComplains(this.props, this.stopActivityIndicator);
-          // }}
-          // onEndReachedThreshold={0}
           style={{ margin: 8, backgroundColor: "rgba(0,0,0,0)" }}
           refreshing={this.state.refrash}
           onRefresh={() => {
             this.setState({ refrash: true });
           }}
         />
-
-        <Overlay
-          animated={true}
-          animationType="slide"
-          isVisible={this.state.complainModal}
-          onBackdropPress={() => {
-            this.setState({ complainModal: false });
-            StatusBar.setBackgroundColor("rgba(0,0,0,0)", true);
-          }}
-          height="auto"
-        >
-          <View style={styles.overlayComplain}>
-            <View style={styles.overlayAvatarContainer}>
-              <Avatar
-                rounded
-                source={{
-                  uri: this.state.complainModalDetails.profile_picture
-                }}
-                title={this.state.complainModalDetails.title}
-                overlayContainerStyle={{
-                  backgroundColor: this.state.complainModalDetails
-                    .backgroundColor,
-                  elevation: 5
-                }}
-              />
-              <Text>{this.state.complainModalDetails.gmail}</Text>
-              {/* <Text>{this.formateDate(this.state.complainModalDetails)}</Text> */}
-            </View>
-            <View style={{ marginTop: 8 }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                Complain:
-              </Text>
-              <Text style={{ marginTop: 8 }}>
-                {this.state.complainModalDetails.complain}
-              </Text>
-            </View>
-            <Button
-              raised
-              containerStyle={{ marginTop: 8 }}
-              buttonStyle={{ backgroundColor: "red" }}
-              title="Delete"
-              onPress={() => {
-                deleteSingleComplain(
-                  this.props,
-                  this.state.complainModalDetails,
-                  this.hideOverlay
-                );
-              }}
-            />
-          </View>
-        </Overlay>
-        {/* <Button
-          onPress={() => {
-            getComplains(this.props, this.stopActivityIndicator);
-          }}
-          title="Complain"
-        /> */}
       </View>
     );
   }
-
-  hideOverlay = () => {
-    this.setState({ complainModal: false, complainModalDetails: "" });
-  };
 
   renderFooter = () => {
     if (!this.state.loading) return null;
@@ -283,16 +229,12 @@ class ComplainScreen extends Component {
       this.state.complains[index] = complain;
       this.setState(
         {
-          complains: this.state.complains,
-          complainModal: true,
-          complainModalDetails: {
-            ...complain,
-            title: complain.gmail[0].toUpperCase()
-          }
+          complains: this.state.complains
         },
         () => {
+          this.props.navigation.navigate("Complain", { complain: complain });
           readComplain(complain);
-          StatusBar.setBackgroundColor("rgba(0,0,0,0.4)", true);
+          // StatusBar.setBackgroundColor("rgba(0,0,0,0.4)", true);
         }
       );
     } else {

@@ -16,6 +16,7 @@ import AdminScreen from "./Screens/AdminsScreen";
 
 // import Worker from "./Screens/Worker";
 import User from "./Screens/User";
+import Complain from "./Screens/Complain";
 
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -80,6 +81,21 @@ const Users = createStackNavigator({
   }
 });
 
+const ComplainsStack = createStackNavigator({
+  Complains: {
+    screen: ComplainScreen,
+    navigationOptions: {
+      header: () => null
+    }
+  },
+  Complain: {
+    screen: Complain,
+    navigationOptions: {
+      header: () => null
+    }
+  }
+});
+
 const Drawer = createDrawerNavigator(
   {
     Home: {
@@ -94,7 +110,7 @@ const Drawer = createDrawerNavigator(
       screen: ProfileScreen
     },
     Complains: {
-      screen: ComplainScreen,
+      screen: ComplainsStack,
       navigationOptions: {
         drawerIcon: ({ tintColor }) => (
           <Icon name="ios-send" color={tintColor} size={24} />

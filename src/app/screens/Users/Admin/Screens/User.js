@@ -20,7 +20,7 @@ class User extends Component {
     User: null
   };
   componentWillMount() {
-    const User = this.props.navigation.getParam("User", null);
+    let User = this.props.navigation.getParam("User", null);
     if (User != null) {
       this.setState({ User: User }, () => {
         console.log(this.state.User);
@@ -91,25 +91,6 @@ class User extends Component {
             label="Last Logged In"
             inputContainerStyle={styles.input}
           />
-          {/* <Input
-            label="User Type"
-            inputContainerStyle={styles.input}
-            inputComponent={Picker}
-            selectedValue={this.state.User.user_type}
-            mode="dropdown"
-            onValueChange={(itemValue, itemIndex) => {
-              if (itemValue != this.state.User.user_type) {
-                this.setState({
-                  User: { ...this.state.User, user_type: itemValue }
-                });
-                updateType(this.props, this.state.User, itemValue);
-              }
-            }}
-          >
-            <Picker.Item value="User" label="User" />
-            <Picker.Item value="Worker" label="Worker" />
-            <Picker.Item value="Admin" label="Admin" />
-          </Input> */}
 
           {this.pickers()}
         </View>
@@ -120,7 +101,7 @@ class User extends Component {
           disabled={this.state.User.su ? true : false}
           buttonStyle={{ backgroundColor: "red" }}
           onPress={() => {
-            deleteSingleWorkerAndUser(this.props, this.state.user);
+            deleteSingleWorkerAndUser(this.props, this.state.User);
           }}
         />
       </ScrollView>

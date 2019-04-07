@@ -1,24 +1,29 @@
-import firebase from "@firebase/app";
-
-import "@firebase/firestore";
-
-import "../Config";
+import firebase from "react-native-firebase";
 
 import Snackbar from "react-native-snackbar";
 
 import {
   storeComplain,
   deleteComplain,
-  refrashComplains,
-  readComplainAction
+  updateComplainAction
 } from "../../redux/actions/ComplainAction";
 
 import RandomColor from "randomcolor";
 
 const DBComplain = firebase.firestore().collection("complains");
+var getCOmplainsUnsubscriber = null;
 
 export const sendComplain = complain => {
-  DBComplain.add({ ...complain, time: Date.now(), read: false })
+  const docRef = DBComplain.doc();
+
+  docRef
+    .set({
+      ...complain,
+      time: Date.now(),
+      read: false,
+      id: docRef.id,
+      backgroundColor: RandomColor()
+    })
     .then(() => {
       Snackbar.show({
         title: "Complain sent successfully.",
@@ -47,84 +52,64 @@ const limit = 10;
 
 export const getComplains = (props, stopActivityIndicatore, refash = false) => {
   try {
-    DBComplain.orderBy("time", "desc")
-      .get()
-      .then(snapshot => {
+    getCOmplainsUnsubscriber = DBComplain.orderBy("time", "ASC").onSnapshot(
+      snapshot => {
         if (snapshot.empty) {
           props.dispatch(storeComplain());
         } else {
-          snapshot.docs.forEach(doc => {
-            var temp = doc.data();
+          snapshot.docChanges.forEach(doc => {
+            var temp = doc.doc.data();
             var bg = "white";
             if (temp.read) {
               bg = "#ebebeb";
             }
 
-            props.dispatch(
-              storeComplain({
-                ...temp,
-                id: doc.id,
-                backgroundColor: RandomColor(),
-                isSelected: false,
-                style: {
-                  backgroundColor: bg
-                }
-              })
-            );
+            if (doc.type === "added") {
+              props.dispatch(
+                storeComplain({
+                  ...doc.doc.data(),
+                  id: doc.doc.id,
+                  isSelected: false,
+                  style: {
+                    backgroundColor: bg
+                  }
+                })
+              );
+            }
+            if (doc.type === "modified") {
+              props.dispatch(
+                updateComplainAction({
+                  ...doc.doc.data(),
+                  id: doc.doc.id,
+                  isSelected: false,
+                  style: {
+                    backgroundColor: bg
+                  }
+                })
+              );
+            }
+            if (doc.type === "removed") {
+              props.dispatch(deleteComplain({ ...doc.doc.data() }));
+            }
           });
         }
         stopActivityIndicatore();
-      });
-    // if (refash) {
-    //   // next = first;
-    //   props.dispatch(refrashComplains);
-    // }
-
-    // // if (next === null || undefined || "") return;
-
-    // DBComplain.orderBy("time", "desc")
-    //   .get()
-    //   .then(snapshot => {
-    //     //last document
-    //     var lastVisible = snapshot.docs[snapshot.docs.length - 1];
-    //     //current page documents
-    //     snapshot.docs.forEach(doc => {
-    //       var temp = doc.data();
-    //       var bg = "white";
-    //       if (temp.read) {
-    //         bg = "#ebebeb";
-    //       }
-    //       props.dispatch(
-    //         storeComplain({
-    //           ...temp,
-    //           id: doc.id,
-    //           backgroundColor: RandomColor(),
-    //           isSelected: false,
-    //           style: {
-    //             backgroundColor: bg
-    //           }
-    //         })
-    //       );
-    //       // console.log(doc.data());
-    //     });
-    //     //update next to page end
-    //     // if (lastVisible != undefined) {
-    //     //   next = DBComplain.orderBy("time", "desc")
-    //     //     .startAfter(lastVisible)
-    //     //     .limit(limit);
-    //     // } else {
-    //     //   next = null;
-    //     //   stopActivityIndicatore();
-    //     // }
-    //     stopActivityIndicatore();
-    //   });
+      }
+    );
   } catch (error) {
+    stopActivityIndicatore();
     Snackbar.show({
       title: "Network Error",
       duration: Snackbar.LENGTH_LONG,
       color: "white",
       backgroundColor: "red"
     });
+  }
+};
+
+export const unsubscriberComplaines = () => {
+  if (getCOmplainsUnsubscriber != null) {
+    getCOmplainsUnsubscriber();
   }
 };
 
@@ -167,13 +152,13 @@ export const deleteComplains = (complains, props) => {
   }
 };
 
-export const deleteSingleComplain = (props, complain, hideOverlay) => {
+export const deleteSingleComplain = (props, complain) => {
   try {
     DBComplain.doc(complain.id)
       .delete()
       .then(() => {
         props.dispatch(deleteComplain(complain));
-        hideOverlay();
+        props.navigation.goBack();
         Snackbar.show({
           title: "Delete successfully.",
           duration: Snackbar.LENGTH_LONG,

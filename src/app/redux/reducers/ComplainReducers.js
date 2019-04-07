@@ -15,7 +15,7 @@ const ComplainRedcer = (state = ComplinDefaultState, action) => {
         if (found) {
           return state;
         } else {
-          return [...state, action.complain];
+          return [action.complain, ...state];
         }
       }
 
@@ -34,14 +34,15 @@ const ComplainRedcer = (state = ComplinDefaultState, action) => {
       return ComplinDefaultState;
     case "READ_COMPLAIN":
       var tempArray = state.map(complain => {
-        if (complain.id === action.complain.id) {
-          return { ...complain, read: !complain.read };
-        } else {
-          return complain;
-        }
+        return complain.id != action.complain.id;
       });
-      console.log(tempArray);
-      return tempArray;
+      return [{ ...action.complain, read: true }, ...tempArray];
+    case "UPDATE_COMPLAIN":
+      let deleteFilter = state.filter(complain => {
+        return complain.id != action.complain.id;
+      });
+
+      return [{ ...action.complain }, ...deleteFilter];
     default:
       return state;
   }

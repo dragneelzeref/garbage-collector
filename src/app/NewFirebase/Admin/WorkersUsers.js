@@ -254,10 +254,15 @@ export const deleteSingleWorkerAndUser = (props, worker) => {
           user: worker
         }
       )
-      .then(() => {
-        props.dispatch(deleteAllUsersAction(worker));
-        props.navigation.goBack();
-      });
+      .then(
+        () => {
+          props.dispatch(deleteAllUsersAction(worker));
+          props.navigation.goBack();
+        },
+        reason => {
+          console.log(reason);
+        }
+      );
   } catch (error) {
     console.log(erro);
     Snackbar.show({

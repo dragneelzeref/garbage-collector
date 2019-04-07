@@ -24,3 +24,10 @@ export const readComplainAction = complain => {
     complain: complain
   };
 };
+
+export const updateComplainAction = complain => {
+  return {
+    type: "UPDATE_COMPLAIN",
+    complain: complain
+  };
+};
