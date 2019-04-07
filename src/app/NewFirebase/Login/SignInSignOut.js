@@ -70,35 +70,33 @@ export const signIn = async (props, signOut = null) => {
               return result.user.uid;
             })
             .then(userId => {
-              signInUnsubcriber = DBUsers.doc(userId).onSnapshot(doc => {
-                const data = doc.data();
-                if (!doc.exists) {
-                  signOut(props);
-                  return;
-                }
+              signInUnsubcriber = DBUsers.doc(userId)
+                .get()
+                .then(doc => {
+                  const data = doc.data();
 
-                AsyncStorage.setItem(
-                  "user",
-                  JSON.stringify(doc.data()),
-                  error => {
-                    console.log(error);
-                  }
-                );
-                // .then(() => {
-                // });
+                  AsyncStorage.setItem(
+                    "user",
+                    JSON.stringify(doc.data()),
+                    error => {
+                      console.log(error);
+                    }
+                  );
+                  // .then(() => {
+                  // });
 
-                if (props.user.user_type != data.user_type) {
-                } else {
-                  if (props.activeItemKey === "Profile") {
-                    props.navigation.dispatch(DrawerActions.closeDrawer());
+                  if (props.user.user_type != data.user_type) {
                   } else {
-                    props.navigation.navigate("Profile");
+                    if (props.activeItemKey === "Profile") {
+                      props.navigation.dispatch(DrawerActions.closeDrawer());
+                    } else {
+                      props.navigation.navigate("Profile");
+                    }
                   }
-                }
-                StatusBar.setBackgroundColor("rgba(255,255,255,0)", true);
-                props.dispatch(toggleCustomeDrawerOverlay(false));
-                props.dispatch(getLoggedInUserInfo(data));
-              });
+                  StatusBar.setBackgroundColor("rgba(255,255,255,0)", true);
+                  props.dispatch(toggleCustomeDrawerOverlay(false));
+                  props.dispatch(getLoggedInUserInfo(data));
+                });
             });
         },
         error => {
@@ -191,29 +189,14 @@ export const updateData = (props, data) => {
 
 export const getAlreadyLoggedInUser = (props, user = null) => {
   if (user === null) return;
-  getAlreadyLoggedInUserUnsubscriber = DBUsers.doc(user.uid)
-    .onSnapshot(doc => {
+  getAlreadyLoggedInUserUnsubscriber = DBUsers.doc(user.uid).onSnapshot(
+    doc => {
       props.dispatch(getLoggedInUserInfo(doc.data()));
-    })
-    .then(() => {
-      AsyncStorage.mergeItem("user", JSON.stringify(data));
-      Snackbar.show({
-        title: "Updated successfully",
-        duration: Snackbar.LENGTH_LONG,
-        backgroundColor: "green",
-        color: "white"
-      });
-    })
-    .catch(error => {
+      AsyncStorage.mergeItem("user", JSON.stringify(doc.data()));
+    },
+    error => {
       console.log(error);
-    });
-};
-
-export const signInSignOutUnsubscriber = () => {
-  if (signInUnsubcriber != null) {
-    signInUnsubcriber();
-  }
-  if (getAlreadyLoggedInUserUnsubscriber != null) {
-    getAlreadyLoggedInUserUnsubscriber();
-  }
+    }
+  );
+  return getAlreadyLoggedInUserUnsubscriber;
 };

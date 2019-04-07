@@ -53,6 +53,8 @@ const check = "check";
 const bell = "bell";
 const close = "close";
 
+var polygonUnscriber;
+
 class HomeScreen extends Component {
   state = {
     region: {
@@ -75,9 +77,12 @@ class HomeScreen extends Component {
   };
 
   componentDidMount() {
-    getPolygons(this.props);
+    polygonUnscriber = getPolygons(this.props);
   }
   componentDidUpdate(prevProps) {}
+  componentWillUnmount() {
+    polygonUnscriber();
+  }
   render() {
     const mapOptions = {
       scrollEnabled: true

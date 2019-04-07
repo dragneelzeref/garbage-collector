@@ -19,7 +19,7 @@ import {
 
 const DBUsers = firebase.firestore().collection("users");
 
-var getAllUsersUnsubscriber = null;
+var getAllUsersUnsubscriber;
 
 export const getAllUsers = (
   props,
@@ -27,8 +27,8 @@ export const getAllUsers = (
   workerHideFooterbar = null,
   adminHideFooterbar = null
 ) => {
-  try {
-    getAllUsersUnsubscriber = DBUsers.onSnapshot(snapshot => {
+  getAllUsersUnsubscriber = DBUsers.onSnapshot(
+    snapshot => {
       if (snapshot.empty) {
         if (userHideFooterbar != null) {
           userHideFooterbar();
@@ -62,10 +62,12 @@ export const getAllUsers = (
           }
         });
       }
-    });
-  } catch (error) {
-    console.log(error);
-  }
+    },
+    error => {
+      console.log(error);
+    }
+  );
+  return getAllUsersUnsubscriber;
 };
 
 export const unsubscriber = () => {

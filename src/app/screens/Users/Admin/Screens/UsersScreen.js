@@ -17,8 +17,7 @@ import TouchableScale from "react-native-touchable-scale"; // https://github.com
 
 import {
   deleteWorkerAndUser,
-  getAllUsers,
-  unsubscriber
+  getAllUsers
 } from "../../../../NewFirebase/Admin/WorkersUsers";
 
 //icon name constant
@@ -26,6 +25,8 @@ const menu = "menu";
 const check = "check";
 const edit = "edit";
 const del = "delete";
+
+var unsubscriber;
 
 class UsersScreen extends Component {
   state = {
@@ -39,7 +40,7 @@ class UsersScreen extends Component {
     SearchText: null
   };
   componentDidMount() {
-    getAllUsers(this.props, this.hideFooterLoading);
+    unsubscriber = getAllUsers(this.props, this.hideFooterLoading);
   }
   componentDidUpdate(prevProps) {
     if (this.state.users != this.props.workersUsers.users) {

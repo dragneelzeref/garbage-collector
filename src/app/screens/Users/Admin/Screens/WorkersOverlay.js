@@ -6,12 +6,11 @@ import { connect } from "react-redux";
 
 import TouchableScale from "react-native-touchable-scale"; // https://github.com/kohver/react-native-touchable-scale
 
-import {
-  getAllUsers,
-  unsubscriber
-} from "../../../../NewFirebase/Admin/WorkersUsers";
+import { getAllUsers } from "../../../../NewFirebase/Admin/WorkersUsers";
 
 import Icon from "react-native-vector-icons/MaterialIcons";
+
+var unsubscriber;
 
 //icon name constant
 const menu = "menu";
@@ -33,7 +32,7 @@ class WorkersScreen extends Component {
       workers: this.props.workersUsers.workers,
       footerLoading: false
     });
-    getAllUsers(this.props, this.hideFooterLoading);
+    unsubscriber = getAllUsers(this.props, this.hideFooterLoading);
   }
   componentDidUpdate(prevProps) {
     if (this.state.workers != this.props.workersUsers.workers) {

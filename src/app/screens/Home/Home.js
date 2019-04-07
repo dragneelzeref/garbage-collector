@@ -20,6 +20,8 @@ import {
 
 import { getAlreadyLoggedInUser } from "../../NewFirebase/Login/SignInSignOut";
 
+var unsuubscribeGetalreadyLoggedinUser;
+
 class Home extends Component {
   state = {
     Drawer: DrawerUser
@@ -28,6 +30,10 @@ class Home extends Component {
   componentDidMount() {
     this.mapUserWithComponet();
     getLocationUpdates(this.props);
+    unsuubscribeGetalreadyLoggedinUser = getAlreadyLoggedInUser(
+      this.props,
+      this.props.user
+    );
   }
 
   componentDidUpdate(prevProps) {
@@ -37,6 +43,7 @@ class Home extends Component {
   }
   componentWillUnmount() {
     removeLocationUpdates();
+    unsuubscribeGetalreadyLoggedinUser();
   }
   render() {
     return <this.state.Drawer />;

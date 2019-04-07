@@ -12,9 +12,11 @@ import {
 
 const DBPolygons = firebase.firestore().collection("polygons");
 
+var polygonUnsubscriber;
+
 export const getPolygons = props => {
-  try {
-    DBPolygons.onSnapshot(snapshot => {
+  polygonUnsubscriber = DBPolygons.onSnapshot(
+    snapshot => {
       if (snapshot.empty) {
         //if empty
         props.dispatch(storePolygonAction());
@@ -34,17 +36,19 @@ export const getPolygons = props => {
           }
         });
       }
-    });
-  } catch (error) {
-    props.dispatch(storePolygonAction());
-    Snackbar.show({
-      title: "Network error",
-      duration: Snackbar.LENGTH_LONG,
-      color: "white",
-      backgroundColor: "red"
-    });
-    console.log(error);
-  }
+    },
+    erro => {
+      props.dispatch(storePolygonAction());
+      Snackbar.show({
+        title: "Network error",
+        duration: Snackbar.LENGTH_LONG,
+        color: "white",
+        backgroundColor: "red"
+      });
+      console.log(error);
+    }
+  );
+  return polygonUnsubscriber;
 };
 
 export const sendPolygon = (props, coordinates) => {

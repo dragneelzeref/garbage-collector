@@ -51,66 +51,64 @@ const limit = 10;
 // var next = first;
 
 export const getComplains = (props, stopActivityIndicatore, refash = false) => {
-  try {
-    getCOmplainsUnsubscriber = DBComplain.orderBy("time", "ASC").onSnapshot(
-      snapshot => {
-        if (snapshot.empty) {
-          props.dispatch(storeComplain());
-        } else {
-          snapshot.docChanges.forEach(doc => {
-            var temp = doc.doc.data();
-            var bg = "white";
-            if (temp.read) {
-              bg = "#ebebeb";
-            }
+  getCOmplainsUnsubscriber = getCOmplainsUnsubscriber = DBComplain.orderBy(
+    "time",
+    "ASC"
+  ).onSnapshot(
+    snapshot => {
+      if (snapshot.empty) {
+        props.dispatch(storeComplain());
+      } else {
+        snapshot.docChanges.forEach(doc => {
+          var temp = doc.doc.data();
+          var bg = "white";
+          if (temp.read) {
+            bg = "#ebebeb";
+          }
 
-            if (doc.type === "added") {
-              props.dispatch(
-                storeComplain({
-                  ...doc.doc.data(),
-                  id: doc.doc.id,
-                  isSelected: false,
-                  style: {
-                    backgroundColor: bg
-                  }
-                })
-              );
-            }
-            if (doc.type === "modified") {
-              props.dispatch(
-                updateComplainAction({
-                  ...doc.doc.data(),
-                  id: doc.doc.id,
-                  isSelected: false,
-                  style: {
-                    backgroundColor: bg
-                  }
-                })
-              );
-            }
-            if (doc.type === "removed") {
-              props.dispatch(deleteComplain({ ...doc.doc.data() }));
-            }
-          });
-        }
-        stopActivityIndicatore();
+          if (doc.type === "added") {
+            props.dispatch(
+              storeComplain({
+                ...doc.doc.data(),
+                id: doc.doc.id,
+                isSelected: false,
+                style: {
+                  backgroundColor: bg
+                }
+              })
+            );
+          }
+          if (doc.type === "modified") {
+            props.dispatch(
+              updateComplainAction({
+                ...doc.doc.data(),
+                id: doc.doc.id,
+                isSelected: false,
+                style: {
+                  backgroundColor: bg
+                }
+              })
+            );
+          }
+          if (doc.type === "removed") {
+            props.dispatch(deleteComplain({ ...doc.doc.data() }));
+          }
+        });
       }
-    );
-  } catch (error) {
-    stopActivityIndicatore();
-    Snackbar.show({
-      title: "Network Error",
-      duration: Snackbar.LENGTH_LONG,
-      color: "white",
-      backgroundColor: "red"
-    });
-  }
-};
-
-export const unsubscriberComplaines = () => {
-  if (getCOmplainsUnsubscriber != null) {
-    getCOmplainsUnsubscriber();
-  }
+      stopActivityIndicatore();
+    },
+    error => {
+      console.log(error);
+      stopActivityIndicatore();
+      Snackbar.show({
+        title: "Network Error",
+        duration: Snackbar.LENGTH_LONG,
+        color: "white",
+        backgroundColor: "red"
+      });
+    }
+  );
+  return getCOmplainsUnsubscriber;
 };
 
 export const readComplain = complain => {

@@ -17,11 +17,12 @@ import TouchableScale from "react-native-touchable-scale"; // https://github.com
 
 import {
   getAllUsers,
-  deleteWorkerAndUser,
-  unsubscriber
+  deleteWorkerAndUser
 } from "../../../../NewFirebase/Admin/WorkersUsers";
 
 import Snackbar from "react-native-snackbar";
+
+var unsubscriber;
 
 //icon name constant
 const menu = "menu";
@@ -41,7 +42,7 @@ class AdminScreen extends Component {
     SearchText: null
   };
   componentDidMount() {
-    getAllUsers(this.props, this.hideFooterLoading);
+    unsubscriber = getAllUsers(this.props, this.hideFooterLoading);
   }
   componentDidUpdate(prevProps) {
     if (this.state.admins != this.props.workersUsers.admins) {

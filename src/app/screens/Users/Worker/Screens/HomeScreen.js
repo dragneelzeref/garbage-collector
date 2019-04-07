@@ -20,6 +20,11 @@ import FloatingHeaderBar from "../../../../components/FloatingHeaderBar";
 import { getLocation } from "../../../../components/Location/Listener";
 
 import {
+  sendLiveLocation,
+  stopSendLiveLocation
+} from "../../../../NewFirebase/Wokers/onlineWorkers";
+
+import {
   latitudeDelta,
   longitudeDelta,
   latitude,
@@ -40,6 +45,17 @@ class HomeScreen extends Component {
       longitudeDelta: longitudeDelta
     }
   };
+  componentDidMount() {
+    console.log(this.props.navigation);
+    if (this.props.user) {
+      sendLiveLocation(this.props, this.props.user);
+    }
+  }
+  componentWillUnmount() {
+    if (this.props.user) {
+      stopSendLiveLocation(this.props, this.props.user);
+    }
+  }
   componentDidUpdate(prevProps) {
     if (prevProps.localLocation.coords != this.props.localLocation.coords) {
       this.moveRegion(this.props.localLocation.coords);
@@ -112,6 +128,7 @@ class HomeScreen extends Component {
 const mapStateToProps = state => {
   return {
     overlays: state.overlays,
+    user: state.user,
     localLocation: state.localLocation
   };
 };

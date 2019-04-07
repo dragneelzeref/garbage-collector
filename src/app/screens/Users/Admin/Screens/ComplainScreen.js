@@ -23,8 +23,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import {
   getComplains,
   deleteComplains,
-  readComplain,
-  unsubscriberComplaines
+  readComplain
 } from "../../../../NewFirebase/Admin/Complains";
 
 import { connect } from "react-redux";
@@ -37,6 +36,8 @@ const check = "check";
 const edit = "edit";
 const del = "delete";
 
+var unsubscriberComplaines;
+
 class ComplainScreen extends Component {
   state = {
     loading: true,
@@ -47,7 +48,10 @@ class ComplainScreen extends Component {
     refrash: false
   };
   componentDidMount() {
-    getComplains(this.props, this.stopActivityIndicator);
+    unsubscriberComplaines = getComplains(
+      this.props,
+      this.stopActivityIndicator
+    );
   }
 
   componentDidUpdate(prevProps, prevState) {
