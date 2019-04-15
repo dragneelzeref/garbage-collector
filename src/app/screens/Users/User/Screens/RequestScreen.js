@@ -23,6 +23,8 @@ import {
 
 import { getCurrentLocation } from "../../../../components/Location/getCurrentLocation";
 
+import { sendRequest } from "../../../../NewFirebase/Admin/Requests";
+
 //header icons start
 
 const HeaderText = () => (
@@ -67,7 +69,13 @@ class RequestScreen extends Component {
             onPress: () => this.props.navigation.goBack()
           }}
           centerComponent={<HeaderText />}
-          rightComponent={{ icon: "check", color: "#000" }}
+          rightComponent={{
+            icon: "check",
+            color: "#000",
+            onPress: () => {
+              sendRequest(this.state.region);
+            }
+          }}
           backgroundColor="white"
           containerStyle={styles.header}
           statusBarProps={{ backgroundColor: "rgba(0,0,0,0)" }}
@@ -120,7 +128,8 @@ class RequestScreen extends Component {
 
 const mapStateToProps = state => {
   return {
-    localLocation: state.localLocation
+    localLocation: state.localLocation,
+    requests: state.requests
   };
 };
 

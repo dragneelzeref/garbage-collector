@@ -21,6 +21,7 @@ import {
 } from "../../navigation/UserConstants/UserConstant";
 
 import "../../screens/Users/Timer";
+import { stopSendLiveLocation } from "../Wokers/onlineWorkers";
 
 YellowBox.ignoreWarnings(["Require cycle:"]);
 
@@ -48,59 +49,76 @@ export const signIn = async (props, signOut = null) => {
           firebase
             .auth()
             .signInWithCredential(credential)
-            .then(result => {
-              //store data for ussingin redux
+            .then(
+              result => {
+                //store data for ussingin redux
 
-              if (!result.additionalUserInfo.isNewUser) {
-                DBUsers.doc(result.user.uid).update({
-                  last_logged_in: Date.now()
-                });
-              } else {
-                DBUsers.doc(result.user.uid).set({
-                  gmail: result.additionalUserInfo.profile.email,
-                  profile_picture: result.additionalUserInfo.profile.picture,
-                  first_name: result.additionalUserInfo.profile.given_name,
-                  last_name: result.additionalUserInfo.profile.family_name,
-                  full_name: result.additionalUserInfo.profile.name,
-                  created_at: Date.now(),
-                  user_type: User,
-                  uid: result.user.uid
-                });
+                if (!result.additionalUserInfo.isNewUser) {
+                  DBUsers.doc(result.user.uid).update({
+                    last_logged_in: Date.now()
+                  });
+                } else {
+                  DBUsers.doc(result.user.uid).set({
+                    gmail: result.additionalUserInfo.profile.email,
+                    profile_picture: result.additionalUserInfo.profile.picture,
+                    first_name: result.additionalUserInfo.profile.given_name,
+                    last_name: result.additionalUserInfo.profile.family_name,
+                    full_name: result.additionalUserInfo.profile.name,
+                    created_at: Date.now(),
+                    user_type: User,
+                    uid: result.user.uid
+                  });
+                }
+                return result.user.uid;
+              },
+              error => {
+                props.dispatch(toggleCustomeDrawerOverlay(false));
               }
-              return result.user.uid;
-            })
-            .then(userId => {
-              signInUnsubcriber = DBUsers.doc(userId)
-                .get()
-                .then(doc => {
-                  const data = doc.data();
+            )
+            .then(
+              userId => {
+                signInUnsubcriber = DBUsers.doc(userId)
+                  .get()
+                  .then(
+                    doc => {
+                      const data = doc.data();
 
-                  AsyncStorage.setItem(
-                    "user",
-                    JSON.stringify(doc.data()),
+                      AsyncStorage.setItem(
+                        "user",
+                        JSON.stringify(doc.data()),
+                        error => {
+                          console.log(error);
+                        }
+                      );
+                      // .then(() => {
+                      // });
+
+                      if (props.user.user_type != data.user_type) {
+                      } else {
+                        if (props.activeItemKey === "Profile") {
+                          props.navigation.dispatch(
+                            DrawerActions.closeDrawer()
+                          );
+                        } else {
+                          props.navigation.navigate("Profile");
+                        }
+                      }
+                      StatusBar.setBackgroundColor("rgba(255,255,255,0)", true);
+                      props.dispatch(toggleCustomeDrawerOverlay(false));
+                      props.dispatch(getLoggedInUserInfo(data));
+                    },
                     error => {
-                      console.log(error);
+                      props.dispatch(toggleCustomeDrawerOverlay(false));
                     }
                   );
-                  // .then(() => {
-                  // });
-
-                  if (props.user.user_type != data.user_type) {
-                  } else {
-                    if (props.activeItemKey === "Profile") {
-                      props.navigation.dispatch(DrawerActions.closeDrawer());
-                    } else {
-                      props.navigation.navigate("Profile");
-                    }
-                  }
-                  StatusBar.setBackgroundColor("rgba(255,255,255,0)", true);
-                  props.dispatch(toggleCustomeDrawerOverlay(false));
-                  props.dispatch(getLoggedInUserInfo(data));
-                });
-            });
+              },
+              error => {
+                props.dispatch(toggleCustomeDrawerOverlay(false));
+              }
+            );
         },
         error => {
-          console.log(error);
+          props.dispatch(toggleCustomeDrawerOverlay(false));
         }
       );
     } // sign in
@@ -123,6 +141,7 @@ export const signIn = async (props, signOut = null) => {
     } else {
       // some other error happened
     }
+
     Snackbar.show({
       title: "Please try again",
       duration: Snackbar.LENGTH_LONG,
@@ -134,17 +153,20 @@ export const signIn = async (props, signOut = null) => {
 
 export const signOut = props => {
   try {
-    if (props.user.gmail) {
+    if (props.user.user_type === "Worker") {
+      stopSendLiveLocation(props, props.user);
+    }
+    GoogleSignin.isSignedIn().then(res => {
       GoogleSignin.revokeAccess();
       GoogleSignin.signOut();
+    });
+    AsyncStorage.clear().then(() => {
+      props.dispatch(signOutUser());
+      if (props.user.user_type === "User") {
+        props.navigation.navigate("Home");
+      }
+    });
 
-      AsyncStorage.clear().then(() => {
-        props.dispatch(signOutUser());
-        if (props.user.user_type === "User") {
-          props.navigation.navigate("Home");
-        }
-      });
-    }
     // Remember to remove the user from your app's state as well
   } catch (error) {
     Snackbar.show({

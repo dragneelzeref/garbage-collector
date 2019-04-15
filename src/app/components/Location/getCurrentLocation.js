@@ -88,7 +88,13 @@ export const watchLocation = props => {
           console.log(error);
         },
         {
-          enableHighAccuracy: true
+          enableHighAccuracy: true,
+          enableHighAccuracy: true,
+          timeout: 15000,
+          interval: 10000,
+          fastestInterval: 5000,
+          maximumAge: 10000,
+          distanceFilter: 100
         }
       );
       props.dispatch(setWatchId(watchId));

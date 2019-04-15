@@ -16,7 +16,7 @@ class FloatingHeaderBar extends Component {
           }}
         />
         <Text color="black">{this.props.navigation.state.routeName}</Text>
-        <AlertIcon name="bell" size={24} color="black" />
+        <AlertIcon name="bell" size={24} color="rgba(0,0,0,0)" />
       </View>
     );
   }

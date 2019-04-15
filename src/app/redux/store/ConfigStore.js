@@ -6,6 +6,9 @@ import LocalLocation from "../reducers/LocalLocation";
 import ComplainReducers from "../reducers/ComplainReducers";
 import WorkersUsersReducers from "../reducers/WorkersUsersReducers";
 import PolygonsReducer from "../reducers/PolygonsReducer";
+import onlineWorkersReducer from "../reducers/onlineWorkersReducer";
+import RequestReducer from "../reducers/RequestReducer";
+import WorkerPolygonReducer from "../reducers/WorkerPolygonReducer";
 
 import thunk from "redux-thunk";
 
@@ -18,7 +21,10 @@ export default () => {
         localLocation: LocalLocation,
         complains: ComplainReducers,
         workersUsers: WorkersUsersReducers,
-        polygons: PolygonsReducer
+        polygons: PolygonsReducer,
+        onlineWorkers: onlineWorkersReducer,
+        requests: RequestReducer,
+        workerPolygon: WorkerPolygonReducer
       },
       applyMiddleware(thunk)
     )

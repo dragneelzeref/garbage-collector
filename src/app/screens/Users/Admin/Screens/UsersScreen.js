@@ -182,7 +182,7 @@ class UsersScreen extends Component {
     item.style = item.isSelected
       ? { backgroundColor: "green" }
       : { backgroundColor: "white" };
-    const index = this.state.users.findIndex(res => res.id === item.id);
+    const index = this.state.users.findIndex(res => res.uid === item.uid);
     this.state.users[index] = item;
     this.setState({
       users: this.state.users

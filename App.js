@@ -26,11 +26,6 @@ import "./src/app/firebase/GooglesignInConfig";
 //store
 import ConfigStore from "./src/app/redux/store/ConfigStore";
 
-import {
-  signInSignOutUnsubscriber,
-  getAlreadyLoggedInUser
-} from "./src/app/NewFirebase/Login/SignInSignOut";
-
 // import {
 //   watchLocationStop,
 //   watchLocation
@@ -60,7 +55,7 @@ export default class App extends Component<Props> {
       "connectionChange",
       this.handleNetworkConnection
     );
-    signInSignOutUnsubscriber();
+
     // watchLocationStop(store);
   }
   render() {

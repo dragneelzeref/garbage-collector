@@ -30,10 +30,10 @@ class Home extends Component {
   componentDidMount() {
     this.mapUserWithComponet();
     getLocationUpdates(this.props);
-    unsuubscribeGetalreadyLoggedinUser = getAlreadyLoggedInUser(
-      this.props,
-      this.props.user
-    );
+    // unsuubscribeGetalreadyLoggedinUser = getAlreadyLoggedInUser(
+    //   this.props,
+    //   this.props.user
+    // );
   }
 
   componentDidUpdate(prevProps) {
@@ -43,7 +43,7 @@ class Home extends Component {
   }
   componentWillUnmount() {
     removeLocationUpdates();
-    unsuubscribeGetalreadyLoggedinUser();
+    // unsuubscribeGetalreadyLoggedinUser();
   }
   render() {
     return <this.state.Drawer />;

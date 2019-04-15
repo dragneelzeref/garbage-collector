@@ -24,6 +24,7 @@
     "react-native-ignore-warnings": "^0.1.1",
     "react-native-linear-gradient": "^2.5.4",
     "react-native-maps": "^0.23.0",
+    "react-native-maps-directions": "^1.6.0",
     "react-native-snackbar": "^0.5.5",
     "react-native-snackbar-avoiding-view": "^1.0.1",
     "react-native-touchable-scale": "^2.0.0",

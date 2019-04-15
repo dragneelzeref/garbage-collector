@@ -183,7 +183,7 @@ class WorkersScreen extends Component {
     item.style = item.isSelected
       ? { backgroundColor: "green" }
       : { backgroundColor: "white" };
-    const index = this.state.workers.findIndex(res => res.id === item.id);
+    const index = this.state.workers.findIndex(res => res.uid === item.uid);
     this.state.workers[index] = item;
     this.setState({
       workers: this.state.workers

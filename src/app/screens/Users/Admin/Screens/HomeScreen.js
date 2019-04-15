@@ -13,6 +13,7 @@ import { Button, Avatar, Overlay } from "react-native-elements";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import AlertIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import MapView, {
   PROVIDER_GOOGLE,
@@ -20,6 +21,10 @@ import MapView, {
   Polygon,
   Callout
 } from "react-native-maps";
+
+import MapViewDirections from "react-native-maps-directions";
+
+import { KEY } from "../../../../APIS/key";
 
 import { connect } from "react-redux";
 import {
@@ -48,12 +53,23 @@ import {
   addWorkerToPolygon
 } from "../../../../NewFirebase/Admin/Polygons";
 
+import {
+  getLiveWorkers,
+  getWorkersWayPoints
+} from "../../../../NewFirebase/Wokers/onlineWorkers";
+
+import { getRequests } from "../../../../NewFirebase/Admin/Requests";
+
 const menu = "menu";
 const check = "check";
-const bell = "bell";
+const bell = "dots-vertical";
 const close = "close";
 
+const bus = "directions-bus";
+
 var polygonUnscriber;
+var getLiveWorkersUnsubscriber;
+var getRequestsUnsubscriber;
 
 class HomeScreen extends Component {
   state = {
@@ -78,10 +94,13 @@ class HomeScreen extends Component {
 
   componentDidMount() {
     polygonUnscriber = getPolygons(this.props);
+    getLiveWorkersUnsubscriber = getLiveWorkers(this.props);
+    getRequestsUnsubscriber = getRequests(this.props);
   }
-  componentDidUpdate(prevProps) {}
   componentWillUnmount() {
     polygonUnscriber();
+    getLiveWorkersUnsubscriber();
+    getRequestsUnsubscriber();
   }
   render() {
     const mapOptions = {
@@ -152,7 +171,7 @@ class HomeScreen extends Component {
                   uri: current.worker ? current.worker.profile_picture : null
                 }}
                 icon={{ name: "edit", color: "black" }}
-                size="medium"
+                size="small"
                 overlayContainerStyle={{
                   backgroundColor: "rgba(255,255,255,1)"
                 }}
@@ -170,6 +189,39 @@ class HomeScreen extends Component {
                   }
                 />
               </Callout>
+            </Marker>
+          ))}
+          {/* workers */}
+          {this.props.onlineWorkers.onlineWorkers.map(worker => (
+            <Marker key={worker.uid} coordinate={worker.last}>
+              <Avatar
+                rounded
+                icon={{ name: bus, color: worker.online ? "white" : "black" }}
+                size="small"
+                overlayContainerStyle={{
+                  backgroundColor: worker.online ? "green" : "white"
+                }}
+              />
+
+              <Callout
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  width: 150
+                }}
+              >
+                <Button
+                  buttonStyle={{ backgroundColor: "white" }}
+                  titleStyle={{ color: "black" }}
+                  title={worker.full_name}
+                />
+              </Callout>
+            </Marker>
+          ))}
+          {/* requests */}
+          {this.props.requests.map(request => (
+            <Marker key={request.rid} coordinate={request.coordinates}>
+              <FontAwesome name="map-marker" size={20} />
             </Marker>
           ))}
         </MapView>
@@ -340,6 +392,13 @@ class HomeScreen extends Component {
       this.overlayBackPress
     );
   };
+  getLastActiveTimeOfWorker = onlineWorker => {
+    let now = new Date.now();
+    let diff = now - onlineWorker.last.timestamp;
+    let days = Math.floor(diff / 1000 / 60 / 60 / 24);
+    diff -= days * 1000 * 60 * 60 * 24;
+    return diff;
+  };
 }
 
 const mapStateToProps = state => {
@@ -348,7 +407,9 @@ const mapStateToProps = state => {
     workersUsers: state.workersUsers,
     overlays: state.overlays,
     localLocation: state.localLocation,
-    polygons: state.polygons
+    polygons: state.polygons,
+    onlineWorkers: state.onlineWorkers,
+    requests: state.requests
   };
 };
 export default connect(mapStateToProps)(HomeScreen);

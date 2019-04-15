@@ -65,8 +65,10 @@ export const getLocation = async props => {
     {
       enableHighAccuracy: true,
       timeout: 15000,
+      interval: 10000,
+      fastestInterval: 5000,
       maximumAge: 10000,
-      distanceFilter: 50,
+      distanceFilter: 100,
       showLocationDialog: true
     }
   );

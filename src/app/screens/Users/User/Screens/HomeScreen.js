@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet, StatusBar, SafeAreaView } from "react-native";
 
-import { Button } from "react-native-elements";
+import { Button, Avatar } from "react-native-elements";
 
 import { connect } from "react-redux";
 import {
@@ -10,9 +10,10 @@ import {
 } from "../../../../redux/actions/LocalLocationActions";
 
 import Icon from "react-native-vector-icons/Entypo";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker, Callout } from "react-native-maps";
+
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import NetworkOverlay from "../../NetworkOverlay";
 import FloatingHeaderBar from "../../../../components/FloatingHeaderBar";
@@ -25,6 +26,17 @@ import {
   latitude,
   longitude
 } from "../../../../redux/reducers/LocalLocation";
+import { addWorkerInArea } from "../../../../redux/actions/onlineWorkersAction";
+
+import { getLiveWorkers } from "../../../../NewFirebase/Wokers/onlineWorkers";
+import { getPolygons } from "../../../../NewFirebase/Admin/Polygons";
+
+import geolib from "geolib";
+
+var getLiveWorkersUnsubscriber;
+var getPolygonsUnsubscriber;
+
+const bus = "directions-bus";
 
 class HomeScreen extends Component {
   static navigationOptions = {
@@ -40,8 +52,16 @@ class HomeScreen extends Component {
       longitudeDelta: longitudeDelta
     }
   };
-  componentDidMount() {}
+  componentDidMount() {
+    getLiveWorkersUnsubscriber = getLiveWorkers(this.props);
+    getPolygonsUnsubscriber = getPolygons(this.props);
+  }
   componentDidUpdate(prevProps) {}
+
+  componentWillUnmount() {
+    getLiveWorkersUnsubscriber();
+    getPolygonsUnsubscriber();
+  }
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -63,8 +83,43 @@ class HomeScreen extends Component {
           onUserLocationChange={e => {
             this.props.dispatch(setGpsOn());
             this.props.dispatch(setCoords(e.nativeEvent.coordinate));
+            this.getMyAreaWorker(e.nativeEvent.coordinate);
           }}
-        />
+        >
+          {this.props.onlineWorkers.onlineWorkers.map(
+            worker =>
+              this.props.onlineWorkers.workersInArea.uid &&
+              worker.online && (
+                <Marker key={worker.uid} coordinate={worker.last}>
+                  <Avatar
+                    rounded
+                    icon={{ name: bus, color: "black" }}
+                    size="small"
+                    overlayContainerStyle={{
+                      backgroundColor: "rgba(255,255,255,1)"
+                    }}
+                  />
+
+                  <Callout
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      width: 150
+                    }}
+                  >
+                    <Button
+                      buttonStyle={{ backgroundColor: "white" }}
+                      titleStyle={{ color: "black" }}
+                      title={
+                        this.getdistanceBetweenWorkerAndUser(worker) +
+                        " Km away"
+                      }
+                    />
+                  </Callout>
+                </Marker>
+              )
+          )}
+        </MapView>
         <FloatingHeaderBar {...this.props} />
         <View style={styles.fabs}>
           <Button
@@ -120,12 +175,31 @@ class HomeScreen extends Component {
       </SafeAreaView>
     );
   }
+  getMyAreaWorker = coordinate => {
+    let polygons = this.props.polygons;
+    polygons.forEach(polygon => {
+      if (geolib.isPointInside(coordinate, polygon.coordinates)) {
+        this.props.dispatch(addWorkerInArea(polygon.worker));
+      } else {
+        console.log("Not in area");
+      }
+    });
+  };
+  getdistanceBetweenWorkerAndUser = worker => {
+    let distance = geolib.getDistance(
+      worker.last,
+      this.props.localLocation.coords
+    );
+    return distance / 1000;
+  };
 }
 
 const mapStateToProps = state => {
   return {
     overlays: state.overlays,
-    localLocation: state.localLocation
+    localLocation: state.localLocation,
+    onlineWorkers: state.onlineWorkers,
+    polygons: state.polygons
   };
 };
 export default connect(mapStateToProps)(HomeScreen);

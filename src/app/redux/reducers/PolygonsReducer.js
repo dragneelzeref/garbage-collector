@@ -15,7 +15,7 @@ const PolygonsReducer = (state = PolygonsDefaultState, action) => {
           found = true;
         }
       });
-      if (found === false && action.polygon.pid) {
+      if (found === false) {
         return [...state, action.polygon];
       } else {
         return state;

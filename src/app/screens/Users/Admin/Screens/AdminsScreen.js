@@ -192,7 +192,7 @@ class AdminScreen extends Component {
       item.style = item.isSelected
         ? { backgroundColor: "green" }
         : { backgroundColor: "white" };
-      const index = this.state.admins.findIndex(res => res.id === item.id);
+      const index = this.state.admins.findIndex(res => res.uid === item.uid);
       this.state.admins[index] = item;
       this.setState({
         admins: this.state.admins

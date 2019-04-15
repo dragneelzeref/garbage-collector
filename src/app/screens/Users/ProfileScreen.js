@@ -11,6 +11,8 @@ import { signOut, updateData } from "../../NewFirebase/Login/SignInSignOut";
 
 import SnackbarAvoidingView from "react-native-snackbar-avoiding-view";
 
+import { stopSendLiveLocation } from "../../NewFirebase/Wokers/onlineWorkers";
+
 class ProfileScreen extends Component {
   static navigationOptions = {
     drawerLabel: () => null
@@ -188,6 +190,9 @@ class ProfileScreen extends Component {
           <Button
             raised
             onPress={() => {
+              if (this.props.user.user_type === "Worker") {
+                stopSendLiveLocation(this.props, this.props.user);
+              }
               signOut(this.props);
             }}
             title="Logout"

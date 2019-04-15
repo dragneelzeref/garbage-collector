@@ -1,7 +1,7 @@
-export const latitudeDelta = 0.0015;
-export const longitudeDelta = 0.00121;
-export const latitude = 22.29691;
-export const longitude = 70.79836;
+export const latitudeDelta = 0.0922;
+export const longitudeDelta = 0.0421;
+export const latitude = 22.2864117;
+export const longitude = 70.7719648;
 
 const LocalLocationDefaultState = {
   gps: false,
