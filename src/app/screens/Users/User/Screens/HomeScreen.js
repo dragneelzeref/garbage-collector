@@ -179,12 +179,11 @@ class HomeScreen extends Component {
     let polygons = this.props.polygons;
     polygons.forEach(polygon => {
       let polygonCoordinates = polygon.coordinates;
-      if (polygonCoordinates) {
-        if (geolib.isPointInside(coordinate, polygonCoordinates)) {
-          this.props.dispatch(addWorkerInArea(polygon.worker));
-        } else {
-          console.log("Not in area");
-        }
+      if (geolib.isPointInside(coordinate, polygonCoordinates)) {
+        this.props.dispatch(addWorkerInArea(polygon.worker));
+      } else {
+        console.log("Not in area");
+        this.props.dispatch(addWorkerInArea({}));
       }
     });
   };

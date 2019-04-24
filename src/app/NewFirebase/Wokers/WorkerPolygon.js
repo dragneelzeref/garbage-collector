@@ -20,7 +20,7 @@ export const getWorkerPolygons = props => {
     snapshot => {
       if (snapshot.empty) {
         //if empty
-        props.dispatch(storeWorkerPolygonAction());
+        // props.dispatch(storeWorkerPolygonAction());
       } else {
         snapshot.docChanges.forEach(chage => {
           const polygon = chage.doc.data();

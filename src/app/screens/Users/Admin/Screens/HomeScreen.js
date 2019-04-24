@@ -159,7 +159,7 @@ class HomeScreen extends Component {
             />
           )}
           {/* markers */
-          this.props.polygons &&
+          this.props.polygons.length > 0 &&
             this.props.polygons.map((current, index) => (
               <Marker
                 key={current.pid}
@@ -194,7 +194,7 @@ class HomeScreen extends Component {
               </Marker>
             ))}
           {/* workers */}
-          {this.props.onlineWorkers.onlineWorker &&
+          {this.props.onlineWorkers.onlineWorkers &&
             this.props.onlineWorkers.onlineWorkers.map(worker => (
               <Marker key={worker.uid} coordinate={worker.last}>
                 <Avatar
@@ -222,7 +222,7 @@ class HomeScreen extends Component {
               </Marker>
             ))}
           {/* requests */}
-          {this.props.requests &&
+          {this.props.requests.length > 0 &&
             this.props.requests.map(request => (
               <Marker key={request.rid} coordinate={request.coordinates}>
                 <FontAwesome name="map-marker" size={20} />

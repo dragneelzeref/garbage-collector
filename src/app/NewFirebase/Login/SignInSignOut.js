@@ -156,10 +156,18 @@ export const signOut = props => {
     if (props.user.user_type === "Worker") {
       stopSendLiveLocation(props, props.user);
     }
-    GoogleSignin.isSignedIn().then(res => {
-      GoogleSignin.revokeAccess();
-      GoogleSignin.signOut();
-    });
+    GoogleSignin.isSignedIn()
+      .then(res => {
+        GoogleSignin.revokeAccess().catch(error => {
+          console.log(error);
+        });
+        GoogleSignin.signOut().catch(error => {
+          console.log(error);
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
     AsyncStorage.clear().then(() => {
       props.dispatch(signOutUser());
       if (props.user.user_type === "User") {
