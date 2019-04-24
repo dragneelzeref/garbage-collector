@@ -35,7 +35,12 @@ export const getRequests = props => {
 export const sendRequest = coordinates => {
   const docRef = DBRequests.doc();
   docRef
-    .set({ rid: docRef.id, coordinates: coordinates, resolved: false })
+    .set({
+      rid: docRef.id,
+      coordinates: coordinates,
+      resolved: false,
+      timestamp: new Date.now()
+    })
     .then(
       () => {
         Snackbar.show({
