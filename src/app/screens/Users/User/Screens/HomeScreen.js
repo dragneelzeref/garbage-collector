@@ -178,10 +178,13 @@ class HomeScreen extends Component {
   getMyAreaWorker = coordinate => {
     let polygons = this.props.polygons;
     polygons.forEach(polygon => {
-      if (geolib.isPointInside(coordinate, polygon.coordinates)) {
-        this.props.dispatch(addWorkerInArea(polygon.worker));
-      } else {
-        console.log("Not in area");
+      let polygonCoordinates = polygon.coordinates;
+      if (polygonCoordinates) {
+        if (geolib.isPointInside(coordinate, polygonCoordinates)) {
+          this.props.dispatch(addWorkerInArea(polygon.worker));
+        } else {
+          console.log("Not in area");
+        }
       }
     });
   };

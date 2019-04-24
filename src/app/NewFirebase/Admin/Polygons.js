@@ -19,7 +19,7 @@ export const getPolygons = props => {
     snapshot => {
       if (snapshot.empty) {
         //if empty
-        props.dispatch(storePolygonAction());
+        // props.dispatch(storePolygonAction());
       } else {
         snapshot.docChanges.forEach(chage => {
           if (chage.type === "added") {
