@@ -39,7 +39,7 @@ export const sendRequest = coordinates => {
       rid: docRef.id,
       coordinates: coordinates,
       resolved: false,
-      timestamp: new Date.now()
+      timestamp: new Date()
     })
     .then(
       () => {

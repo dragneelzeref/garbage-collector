@@ -92,17 +92,28 @@ export const signIn = async (props, signOut = null) => {
                       );
                       // .then(() => {
                       // });
-
-                      if (props.user.user_type != data.user_type) {
-                      } else {
-                        if (props.activeItemKey === "Profile") {
-                          props.navigation.dispatch(
-                            DrawerActions.closeDrawer()
-                          );
-                        } else {
-                          props.navigation.navigate("Profile");
+                      if (props.user.user_type) {
+                        if (props.user.user_type === data.user_type) {
+                          if (props.activeItemKey === "Profile") {
+                            props.navigation.dispatch(
+                              DrawerActions.closeDrawer()
+                            );
+                          } else {
+                            props.navigation.navigate("Profile");
+                          }
                         }
                       }
+
+                      // if (props.user.user_type === data.user_type) {
+                      // } else {
+                      //   if (props.activeItemKey === "Profile") {
+                      //     props.navigation.dispatch(
+                      //       DrawerActions.closeDrawer()
+                      //     );
+                      //   } else {
+                      //     props.navigation.navigate("Profile");
+                      //   }
+                      // }
                       StatusBar.setBackgroundColor("rgba(255,255,255,0)", true);
                       props.dispatch(toggleCustomeDrawerOverlay(false));
                       props.dispatch(getLoggedInUserInfo(data));
